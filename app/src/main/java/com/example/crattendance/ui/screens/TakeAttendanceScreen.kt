@@ -2,6 +2,7 @@ package com.example.crattendance.ui.screens
 
 import android.app.DatePickerDialog
 import android.content.Intent
+import androidx.activity.compose.BackHandler
 import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -67,6 +68,11 @@ fun TakeAttendanceScreen(
     }
 
     var currentStep by remember { mutableIntStateOf(1) }
+
+    BackHandler(enabled = currentStep > 1) {
+        currentStep--
+    }
+
     var showRosterActionDialog by remember { mutableStateOf(false) }
     var activeExportFile by remember { mutableStateOf<File?>(null) }
     var exportTitleText by remember { mutableStateOf("") }
