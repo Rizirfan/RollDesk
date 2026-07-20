@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RollDesk — Attendance Management for Class Representatives</title>
+    <meta name="description" content="A modern Android attendance management app built for Class Representatives to take, track, and manage classroom attendance with ease.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar" id="navbar">
+    <div class="container nav-container">
+        <a href="#" class="nav-logo">
+            <span class="logo-icon">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                    <rect x="2" y="4" width="24" height="20" rx="3" fill="#0D7377"/>
+                    <rect x="5" y="7" width="8" height="14" rx="1" fill="#fff" opacity="0.9"/>
+                    <rect x="15" y="7" width="8" height="14" rx="1" fill="#fff" opacity="0.9"/>
+                    <path d="M8 14 L11 17 L18 10" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+            <span class="logo-text">RollDesk</span>
+        </a>
+        <div class="nav-links" id="navLinks">
+            <a href="#features">Features</a>
+            <a href="#workflow">Workflow</a>
+            <a href="#tech">Tech Stack</a>
+            <a href="#docs">Docs</a>
+            <a href="https://github.com/Rizirfan/RollDesk" class="nav-github" target="_blank">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                GitHub
+            </a>
+        </div>
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="hero-shapes">
+        <div class="shape shape-circle"></div>
+        <div class="shape shape-square"></div>
+        <div class="shape shape-triangle"></div>
+        <div class="shape shape-ring"></div>
+        <div class="shape shape-dot shape-dot-1"></div>
+        <div class="shape shape-dot shape-dot-2"></div>
+        <div class="shape shape-dot shape-dot-3"></div>
+    </div>
+    <div class="container hero-container">
+        <div class="hero-content">
+            <div class="hero-badge">v1.2.0 — Now Available</div>
+            <h1 class="hero-title">
+                Attendance<br>
+                <span class="hero-highlight">Made Simple.</span>
+            </h1>
+            <p class="hero-subtitle">
+                A modern Android app built for Class Representatives to take, track, and manage classroom attendance. Fast, reliable, and entirely offline.
+            </p>
+            <div class="hero-actions">
+                <a href="https://github.com/Rizirfan/RollDesk/releases/latest" class="btn btn-primary" target="_blank">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Download APK
+                </a>
+                <a href="#docs" class="btn btn-outline">
+                    Read Documentation
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </a>
+            </div>
+            <div class="hero-meta">
+                <span class="meta-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#3DDC84"><path d="M17.523 2.094a.336.336 0 0 0-.046-.005h-.005c-.059.004-2.105.15-4.355 1.096C10.867 3.14 9.47 4.6 8.705 5.648a13.08 13.08 0 0 0-1.694 3.032c-.642 1.608-.885 3.363-.885 4.883v.06c.001 1.517.244 3.268.885 4.875.535 1.34 1.382 2.558 1.694 3.04a12.9 12.9 0 0 0 4.412 3.454c2.25.946 4.296 1.091 4.355 1.095h.005c.059-.004 2.106-.149 4.356-1.095a12.9 12.9 0 0 0 4.412-3.454c.312-.482 1.159-1.7 1.694-3.04.641-1.607.884-3.358.885-4.875v-.06c0-1.52-.243-3.275-.885-4.883a13.08 13.08 0 0 0-1.694-3.032C19.484 4.6 18.088 3.14 15.924 2.185c-2.25-.946-4.296-1.091-4.356-1.095a.336.336 0 0 0-.045.005zM12.004 22.19c-.059-.003-1.977-.139-3.86-.93a11.67 11.67 0 0 1-3.877-3.024c-.574-1.056-.843-2.248-.843-3.53v-.052c0-1.276.27-2.468.843-3.524a11.67 11.67 0 0 1 3.877-3.024c1.883-.791 3.801-.927 3.86-.93h.004c.063.003 1.981.139 3.864.93a11.67 11.67 0 0 1 3.877 3.024c.573 1.056.842 2.248.842 3.524v.052c0 1.282-.269 2.474-.842 3.53a11.67 11.67 0 0 1-3.877 3.024c-1.883.791-3.801.927-3.86.93h-.004z"/></svg>
+                    Android 8.0+
+                </span>
+                <span class="meta-divider">|</span>
+                <span class="meta-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#7F52FF"><path d="M1.24 17.51c-.04.18-.14.33-.29.43a.76.76 0 0 0 .37.63c.14.07.29.11.44.11h2.62c.19 0 .36-.09.47-.24l.99-1.59h7.89l.97 1.59c.11.15.28.24.47.24h2.62c.15 0 .3-.04.44-.11a.76.76 0 0 0 .37-.63c-.01-.06-.02-.12-.05-.17L13.25 2.75c-.15-.29-.44-.47-.76-.47s-.61.18-.76.47L1.29 17.34c-.03.05-.04.11-.05.17zm5.92-5.42l-1.84 3h3.69l-1.85-3zm5.92-3.44l1.85 3h-3.7l1.85-3zm-5.57 0l-1.85 3h3.7l-1.85-3z"/></svg>
+                    Kotlin + Compose
+                </span>
+                <span class="meta-divider">|</span>
+                <span class="meta-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0D7377" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                    100% Offline
+                </span>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="phone-mockup">
+                <div class="phone-frame">
+                    <div class="phone-notch"></div>
+                    <div class="phone-screen">
+                        <div class="mock-header">
+                            <div class="mock-greeting">Good Morning</div>
+                            <div class="mock-title">Dashboard</div>
+                        </div>
+                        <div class="mock-stats">
+                            <div class="mock-stat">
+                                <div class="mock-stat-num" style="color:#10B981">24</div>
+                                <div class="mock-stat-label">Present</div>
+                            </div>
+                            <div class="mock-stat">
+                                <div class="mock-stat-num" style="color:#EF4444">3</div>
+                                <div class="mock-stat-label">Absent</div>
+                            </div>
+                            <div class="mock-stat">
+                                <div class="mock-stat-num" style="color:#F59E0B">1</div>
+                                <div class="mock-stat-label">OD</div>
+                            </div>
+                        </div>
+                        <div class="mock-timetable">
+                            <div class="mock-tt-label">Today's Schedule</div>
+                            <div class="mock-tt-item active"><span>9:00</span> Mathematics</div>
+                            <div class="mock-tt-item"><span>10:00</span> Physics</div>
+                            <div class="mock-tt-item"><span>11:00</span> Computer Science</div>
+                        </div>
+                        <div class="mock-bottom-nav">
+                            <div class="mock-nav-item active">
+                                <div class="mock-nav-dot"></div>
+                                Home
+                            </div>
+                            <div class="mock-nav-item">
+                                <div class="mock-nav-dot"></div>
+                                Attendance
+                            </div>
+                            <div class="mock-nav-item">
+                                <div class="mock-nav-dot"></div>
+                                Students
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features -->
+<section class="features" id="features">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">Features</span>
+            <h2 class="section-title">Everything you need to<br>manage attendance</h2>
+            <p class="section-desc">RollDesk packs powerful features into a clean, fast interface. No internet required.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card" data-delay="0">
+                <div class="card-shape shape-accent-circle"></div>
+                <div class="feature-icon" style="background: #ECFDF5; color: #10B981;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <h3>Attendance Tracking</h3>
+                <p>2-step wizard for taking roll call with 5 status options: Present, Absent, Medical Leave, On Duty, and Late.</p>
+            </div>
+            <div class="feature-card" data-delay="1">
+                <div class="card-shape shape-accent-square"></div>
+                <div class="feature-icon" style="background: #EFF6FF; color: #3B82F6;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 10l3 3 3-3"/></svg>
+                </div>
+                <h3>Elective Management</h3>
+                <p>Create electives, enroll students by RRN, and take separate attendance for elective subjects.</p>
+            </div>
+            <div class="feature-card" data-delay="2">
+                <div class="card-shape shape-accent-triangle"></div>
+                <div class="feature-icon" style="background: #FDF4FF; color: #A855F7;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                </div>
+                <h3>Smart Dashboard</h3>
+                <p>At-a-glance overview with today's timetable, quick stats, recent sessions, and one-tap actions.</p>
+            </div>
+            <div class="feature-card" data-delay="3">
+                <div class="card-shape shape-accent-ring"></div>
+                <div class="feature-icon" style="background: #FFF7ED; color: #F97316;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <h3>Timetable Editor</h3>
+                <p>Weekly class schedule editor with Monday to Friday support, 6 periods per day, and PDF upload.</p>
+            </div>
+            <div class="feature-card" data-delay="4">
+                <div class="card-shape shape-accent-circle"></div>
+                <div class="feature-icon" style="background: #F0FDF4; color: #22C55E;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                </div>
+                <h3>Reports & Export</h3>
+                <p>Generate attendance reports in PDF, Excel (.xlsx), or CSV format. Share via text or share sheet.</p>
+            </div>
+            <div class="feature-card" data-delay="5">
+                <div class="card-shape shape-accent-square"></div>
+                <div class="feature-icon" style="background: #FEF2F2; color: #EF4444;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                </div>
+                <h3>Visual Analytics</h3>
+                <p>Circular and bar charts for per-student and per-subject attendance performance visualization.</p>
+            </div>
+            <div class="feature-card" data-delay="6">
+                <div class="card-shape shape-accent-triangle"></div>
+                <div class="feature-icon" style="background: #ECFEFF; color: #06B6D4;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                </div>
+                <h3>Backup & Restore</h3>
+                <p>Export all your data as JSON for safekeeping. Import it back anytime on any device.</p>
+            </div>
+            <div class="feature-card" data-delay="7">
+                <div class="card-shape shape-accent-ring"></div>
+                <div class="feature-icon" style="background: #F5F3FF; color: #8B5CF6;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                </div>
+                <h3>Dark Mode</h3>
+                <p>Full light/dark theme support with system default, light, and dark options for comfortable use.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Workflow -->
+<section class="workflow" id="workflow">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">How it works</span>
+            <h2 class="section-title">Three steps to take attendance</h2>
+            <p class="section-desc">RollDesk makes attendance effortless with a streamlined wizard flow.</p>
+        </div>
+        <div class="workflow-steps">
+            <div class="workflow-step">
+                <div class="step-number">01</div>
+                <div class="step-connector"></div>
+                <div class="step-content">
+                    <h3>Setup</h3>
+                    <p>Import your student roster via CSV, configure your college profile, and set up the weekly timetable.</p>
+                </div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-number">02</div>
+                <div class="step-connector"></div>
+                <div class="step-content">
+                    <h3>Configure</h3>
+                    <p>Select the date, period, and subject from your timetable. RollDesk auto-fills from your schedule.</p>
+                </div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-number">03</div>
+                <div class="step-content">
+                    <h3>Roll Call</h3>
+                    <p>Tap checkboxes to mark attendance. Save, share as text/PDF, or export to Excel in one click.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Tech Stack -->
+<section class="tech" id="tech">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">Built with</span>
+            <h2 class="section-title">Modern Android stack</h2>
+            <p class="section-desc">Built on industry-standard technologies for performance and reliability.</p>
+        </div>
+        <div class="tech-grid">
+            <div class="tech-card">
+                <div class="tech-logo" style="color: #7F52FF;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M1.24 17.51c-.04.18-.14.33-.29.43a.76.76 0 0 0 .37.63c.14.07.29.11.44.11h2.62c.19 0 .36-.09.47-.24l.99-1.59h7.89l.97 1.59c.11.15.28.24.47.24h2.62c.15 0 .3-.04.44-.11a.76.76 0 0 0 .37-.63c-.01-.06-.02-.12-.05-.17L13.25 2.75c-.15-.29-.44-.47-.76-.47s-.61.18-.76.47L1.29 17.34c-.03.05-.04.11-.05.17zm5.92-5.42l-1.84 3h3.69l-1.85-3zm5.92-3.44l1.85 3h-3.7l1.85-3zm-5.57 0l-1.85 3h3.7l-1.85-3z"/></svg>
+                </div>
+                <div class="tech-name">Kotlin</div>
+                <div class="tech-ver">2.3.20</div>
+            </div>
+            <div class="tech-card">
+                <div class="tech-logo" style="color: #4285F4;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <div class="tech-name">Jetpack Compose</div>
+                <div class="tech-ver">Material3</div>
+            </div>
+            <div class="tech-card">
+                <div class="tech-logo" style="color: #3DDC84;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18c0 .55.45 1 1 1h1v3.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5V19h2v3.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5V19h1c.55 0 1-.45 1-1V7H6v11zM3.5 7C2.67 7 2 7.67 2 8.5v7c0 .83.67 1.5 1.5 1.5S5 16.33 5 15.5v-7C5 7.67 4.33 7 3.5 7zm17 0c-.83 0-1.5.67-1.5 1.5v7c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5v-7c0-.83-.67-1.5-1.5-1.5zM15.53 2.16l1.3-1.3c.2-.2.2-.51 0-.71-.2-.2-.51-.2-.71 0l-1.48 1.48C13.85 1.23 12.95 1 12 1c-.96 0-1.86.23-2.66.63L7.85.15c-.2-.2-.51-.2-.71 0-.2.2-.2.51 0 .71l1.31 1.31C6.97 3.26 6 5.01 6 7h12c0-1.99-.97-3.75-2.47-4.84zM10 5H9V4h1v1zm5 0h-1V4h1v1z"/></svg>
+                </div>
+                <div class="tech-name">Android</div>
+                <div class="tech-ver">API 26+</div>
+            </div>
+            <div class="tech-card">
+                <div class="tech-logo" style="color: #E91E63;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                </div>
+                <div class="tech-name">Room DB</div>
+                <div class="tech-ver">SQLite</div>
+            </div>
+            <div class="tech-card">
+                <div class="tech-logo" style="color: #FF6F00;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <div class="tech-name">Hilt DI</div>
+                <div class="tech-ver">Dagger</div>
+            </div>
+            <div class="tech-card">
+                <div class="tech-logo" style="color: #0D7377;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                </div>
+                <div class="tech-name">Navigation3</div>
+                <div class="tech-ver">Jetpack</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats -->
+<section class="stats">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-value" data-target="10">0</div>
+                <div class="stat-label">App Screens</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" data-target="6">0</div>
+                <div class="stat-label">Database Tables</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" data-target="5">0</div>
+                <div class="stat-label">Export Formats</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" data-target="0">0</div>
+                <div class="stat-label">Permissions Required</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Docs -->
+<section class="docs" id="docs">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">Documentation</span>
+            <h2 class="section-title">Get started in minutes</h2>
+            <p class="section-desc">Everything you need to install, configure, and use RollDesk.</p>
+        </div>
+        <div class="docs-grid">
+            <a href="https://github.com/Rizirfan/RollDesk/blob/main/DOCUMENTATION.md" class="docs-card" target="_blank">
+                <div class="docs-card-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <h3>Full Documentation</h3>
+                <p>Complete reference guide covering every screen, feature, data model, and workflow.</p>
+                <span class="docs-arrow">&rarr;</span>
+            </a>
+            <a href="https://github.com/Rizirfan/RollDesk#first-time-setup" class="docs-card" target="_blank">
+                <div class="docs-card-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <h3>Quick Start</h3>
+                <p>Install the APK, import students, set up your timetable, and take your first roll call.</p>
+                <span class="docs-arrow">&rarr;</span>
+            </a>
+            <a href="https://github.com/Rizirfan/RollDesk#build-from-source" class="docs-card" target="_blank">
+                <div class="docs-card-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                </div>
+                <h3>Build from Source</h3>
+                <p>Clone the repo, build with Gradle, and run on your device or emulator.</p>
+                <span class="docs-arrow">&rarr;</span>
+            </a>
+            <a href="https://github.com/Rizirfan/RollDesk/issues" class="docs-card" target="_blank">
+                <div class="docs-card-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </div>
+                <h3>Report Issues</h3>
+                <p>Found a bug or have a feature request? Open an issue on GitHub.</p>
+                <span class="docs-arrow">&rarr;</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+    <div class="cta-shapes">
+        <div class="shape shape-circle"></div>
+        <div class="shape shape-square"></div>
+    </div>
+    <div class="container">
+        <div class="cta-content">
+            <h2>Ready to simplify attendance?</h2>
+            <p>Download RollDesk today and manage classroom attendance like a pro.</p>
+            <div class="cta-actions">
+                <a href="https://github.com/Rizirfan/RollDesk/releases/latest" class="btn btn-white" target="_blank">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Download v1.2.0
+                </a>
+                <a href="https://github.com/Rizirfan/RollDesk" class="btn btn-ghost" target="_blank">
+                    View on GitHub
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container footer-container">
+        <div class="footer-brand">
+            <span class="logo-icon">
+                <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+                    <rect x="2" y="4" width="24" height="20" rx="3" fill="#0D7377"/>
+                    <rect x="5" y="7" width="8" height="14" rx="1" fill="#fff" opacity="0.9"/>
+                    <rect x="15" y="7" width="8" height="14" rx="1" fill="#fff" opacity="0.9"/>
+                    <path d="M8 14 L11 17 L18 10" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+            <span class="footer-name">RollDesk</span>
+            <p class="footer-tagline">Built with Kotlin + Jetpack Compose</p>
+        </div>
+        <div class="footer-links">
+            <a href="https://github.com/Rizirfan/RollDesk" target="_blank">GitHub</a>
+            <a href="https://github.com/Rizirfan/RollDesk/releases" target="_blank">Releases</a>
+            <a href="https://github.com/Rizirfan/RollDesk/issues" target="_blank">Issues</a>
+            <a href="https://github.com/Rizirfan/RollDesk/blob/main/DOCUMENTATION.md" target="_blank">Docs</a>
+        </div>
+        <div class="footer-copy">&copy; 2026 Rizirfan. MIT License.</div>
+    </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
