@@ -373,178 +373,62 @@ body {
     transform: translateY(-2px);
 }
 
-/* ── Phone Mockup ── */
+/* ── Hero Logo Card ── */
 .hero-visual {
     display: flex;
     justify-content: center;
-}
-
-.phone-mockup {
-    perspective: 1000px;
-}
-
-.phone-frame {
-    width: 280px;
-    background: var(--text);
-    border-radius: 36px;
-    padding: 12px;
-    box-shadow: var(--shadow-xl), 0 0 0 1px rgba(0,0,0,0.1);
-    transform: rotateY(-5deg) rotateX(2deg);
-    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.phone-frame:hover {
-    transform: rotateY(0deg) rotateX(0deg);
-}
-
-.phone-notch {
-    width: 100px;
-    height: 24px;
-    background: var(--text);
-    border-radius: 0 0 16px 16px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 2;
-}
-
-.phone-screen {
-    background: var(--bg);
-    border-radius: 24px;
-    overflow: hidden;
-    padding: 16px;
-    min-height: 440px;
-}
-
-.mock-header {
-    margin-bottom: 16px;
-}
-
-.mock-greeting {
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-bottom: 2px;
-}
-
-.mock-title {
-    font-size: 18px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-}
-
-.mock-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-bottom: 16px;
-}
-
-.mock-stat {
-    background: var(--bg-white);
-    border-radius: 10px;
-    padding: 10px 8px;
-    text-align: center;
-    border: 1px solid var(--border-light);
-}
-
-.mock-stat-num {
-    font-size: 20px;
-    font-weight: 800;
-}
-
-.mock-stat-label {
-    font-size: 9px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-weight: 600;
-}
-
-.mock-timetable {
-    background: var(--bg-white);
-    border-radius: 12px;
-    padding: 12px;
-    border: 1px solid var(--border-light);
-    margin-bottom: 16px;
-}
-
-.mock-tt-label {
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-muted);
-    margin-bottom: 8px;
-}
-
-.mock-tt-item {
-    display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 10px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text-secondary);
-    margin-bottom: 4px;
 }
 
-.mock-tt-item span {
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--text-muted);
-    min-width: 36px;
-}
-
-.mock-tt-item.active {
-    background: rgba(13,115,119,0.08);
-    color: var(--primary);
-    font-weight: 600;
-}
-
-.mock-tt-item.active span {
-    color: var(--primary);
-}
-
-.mock-bottom-nav {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
-    background: var(--bg-white);
-    border-radius: 12px;
-    padding: 8px;
-    border: 1px solid var(--border-light);
-}
-
-.mock-nav-item {
+.hero-logo-card {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
-    padding: 6px;
-    border-radius: 8px;
-    font-size: 9px;
-    font-weight: 600;
+    gap: 16px;
+    padding: 48px 56px;
+    background: var(--bg-white);
+    border: 1px solid var(--border-light);
+    border-radius: 32px;
+    box-shadow: var(--shadow-xl);
+    transition: var(--transition);
+}
+
+.hero-logo-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 30px 60px -12px rgba(13,115,119,0.15);
+}
+
+.hero-logo-icon {
+    width: 120px;
+    height: 120px;
+    background: var(--bg);
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-light);
+}
+
+.hero-logo-icon svg {
+    width: 80px;
+    height: 80px;
+}
+
+.hero-logo-name {
+    font-size: 36px;
+    font-weight: 900;
+    letter-spacing: -1.5px;
+    background: linear-gradient(135deg, var(--text) 0%, var(--primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-logo-tagline {
+    font-size: 15px;
     color: var(--text-muted);
-    text-transform: uppercase;
+    font-weight: 500;
     letter-spacing: 0.3px;
-}
-
-.mock-nav-item.active {
-    background: rgba(13,115,119,0.08);
-    color: var(--primary);
-}
-
-.mock-nav-dot {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: currentColor;
-    opacity: 0.2;
-}
-
-.mock-nav-item.active .mock-nav-dot {
-    opacity: 1;
-    background: var(--primary);
 }
 
 /* ── Section Header ── */
@@ -1055,9 +939,8 @@ body {
     .hero-meta { justify-content: center; }
     .hero-visual { order: -1; }
 
-    .phone-frame {
-        width: 240px;
-        transform: none;
+    .hero-logo-card {
+        padding: 36px 40px;
     }
 
     .features-grid { grid-template-columns: 1fr; }
@@ -1105,4 +988,13 @@ body {
 
 .hero-visual {
     animation: fadeInUp 0.8s ease-out 0.3s both;
+}
+
+.hero-logo-card {
+    animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
 }
