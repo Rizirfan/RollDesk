@@ -4,6 +4,29 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    // ── Hero tagline typing cursor animation ──
+    const tagline = document.querySelector('.tagline-text');
+    const cursor = document.querySelector('.cursor');
+    if (tagline && cursor) {
+        const fullText = tagline.getAttribute('data-text');
+        let charIndex = 0;
+
+        // Show cursor blinking first, then start typing
+        setTimeout(() => {
+            cursor.classList.add('blink');
+
+            const typeInterval = setInterval(() => {
+                if (charIndex < fullText.length) {
+                    tagline.textContent += fullText[charIndex];
+                    charIndex++;
+                } else {
+                    clearInterval(typeInterval);
+                    // Cursor keeps blinking after typing completes
+                }
+            }, 65);
+        }, 2800);
+    }
+
     // ── Navbar scroll effect ──
     const navbar = document.getElementById('navbar');
     let lastScroll = 0;
