@@ -31,7 +31,10 @@ data class TimetableEntity(
     val subjectName: String
 )
 
-@Entity(tableName = "attendance_records")
+@Entity(
+    tableName = "attendance_records",
+    indices = [Index(value = ["studentRrn"]), Index(value = ["date"]), Index(value = ["date", "period"])]
+)
 data class AttendanceRecordEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val studentRrn: String,

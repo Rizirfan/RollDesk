@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.example.crattendance.ui.main.CRAttendanceViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun StudentListScreen(
@@ -32,14 +33,21 @@ fun StudentListScreen(
 ) {
     val students by viewModel.students.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
+    var debouncedQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
-    val filteredStudents = remember(students, searchQuery) {
-        students.filter {
-            it.name.contains(searchQuery, ignoreCase = true) ||
-            it.rrn.contains(searchQuery, ignoreCase = true)
+    LaunchedEffect(searchQuery) {
+        delay(200)
+        debouncedQuery = searchQuery
+    }
+
+    val filteredStudents = remember(students, debouncedQuery) {
+        if (debouncedQuery.isEmpty()) students
+        else students.filter {
+            it.name.contains(debouncedQuery, ignoreCase = true) ||
+            it.rrn.contains(debouncedQuery, ignoreCase = true)
         }
     }
 
@@ -55,7 +63,6 @@ fun StudentListScreen(
             .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 16.dp)
     ) {
-        // Header — same compact style as attendance page
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -96,7 +103,6 @@ fun StudentListScreen(
             }
         }
 
-        // Search field — inline, appears when search is active
         if (isSearchActive) {
             OutlinedTextField(
                 value = searchQuery,
@@ -120,7 +126,6 @@ fun StudentListScreen(
             Spacer(modifier = Modifier.height(8.dp))
         }
 
-        // Student list
         if (filteredStudents.isEmpty()) {
             Box(
                 modifier = Modifier.weight(1f),
@@ -133,8 +138,14 @@ fun StudentListScreen(
                 )
             }
         } else {
-            LazyColumn(modifier = Modifier.weight(1f)) {
-                items(filteredStudents.size) { index ->
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(bottom = 16.dp)
+            ) {
+                items(
+                    count = filteredStudents.size,
+                    key = { filteredStudents[it].rrn }
+                ) { index ->
                     val student = filteredStudents[index]
 
                     Row(

@@ -131,8 +131,9 @@ fun ReportsScreen(
                         try {
                             val title = "CR Attendance Report - ${collegeConfig?.course ?: "Class"}"
                             val headers = arrayOf("Student ID/RRN", "Student Name", "Present", "Absent", "Attendance %")
+                            val recordsByStudent = records.groupBy { it.studentRrn }
                             val rowData = students.map { student ->
-                                val studRecs = records.filter { it.studentRrn == student.rrn }
+                                val studRecs = recordsByStudent[student.rrn] ?: emptyList()
                                 val total = studRecs.size
                                 val pres = studRecs.count { it.status == "Present" }
                                 val abs = studRecs.count { it.status == "Absent" }

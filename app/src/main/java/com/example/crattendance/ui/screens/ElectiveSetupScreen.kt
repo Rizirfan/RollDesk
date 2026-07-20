@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -53,9 +54,15 @@ fun ElectiveSetupScreen(
 
     // Search properties for student checklist matching StudentListScreen.kt
     var searchQuery by remember { mutableStateOf("") }
+    var debouncedSearchQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(searchQuery) {
+        delay(200)
+        debouncedSearchQuery = searchQuery
+    }
 
     val activeElectiveNames = remember(electiveStudents) {
         electiveStudents.map { it.electiveName }.distinct().sorted()
@@ -80,10 +87,11 @@ fun ElectiveSetupScreen(
     val showStudentList = effectiveElectiveName != null
 
     // Search filtered students checklist matching roster screen logic
-    val filteredStudents = remember(allStudents, searchQuery) {
-        allStudents.filter {
-            it.name.contains(searchQuery, ignoreCase = true) ||
-            it.rrn.contains(searchQuery, ignoreCase = true)
+    val filteredStudents = remember(allStudents, debouncedSearchQuery) {
+        if (debouncedSearchQuery.isEmpty()) allStudents
+        else allStudents.filter {
+            it.name.contains(debouncedSearchQuery, ignoreCase = true) ||
+            it.rrn.contains(debouncedSearchQuery, ignoreCase = true)
         }
     }
 
@@ -412,6 +420,7 @@ fun ElectiveSetupScreen(
             val absents = session.filter { it.status == "Absent" }
             val presents = session.filter { it.status == "Present" }
             val others = session.filter { it.status != "Present" && it.status != "Absent" }
+            val studentMap = allStudents.associateBy { it.rrn }
 
             androidx.compose.ui.window.Dialog(
                 onDismissRequest = { selectedSessionToView = null }
@@ -453,9 +462,9 @@ fun ElectiveSetupScreen(
                             Text("Absentees:", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                             LazyColumn(modifier = Modifier.heightIn(max = 120.dp).padding(top = 4.dp)) {
                                 items(absents.size) { idx ->
-                                    val student = allStudents.find { it.rrn == absents[idx].studentRrn }
+                                    val studentName = studentMap[absents[idx].studentRrn]?.name ?: "Unknown"
                                     Text(
-                                        "- ${absents[idx].studentRrn} (${student?.name ?: "Unknown"})",
+                                        "- ${absents[idx].studentRrn} ($studentName)",
                                         style = MaterialTheme.typography.bodySmall,
                                         modifier = Modifier.padding(vertical = 2.dp)
                                     )
@@ -479,8 +488,8 @@ fun ElectiveSetupScreen(
                                     sb.append("*Absentees (${absents.size}):*\n")
                                     if (absents.isEmpty()) sb.append("Nil")
                                     else absents.forEach {
-                                        val student = allStudents.find { s -> s.rrn == it.studentRrn }
-                                        sb.append("- ${it.studentRrn} (${student?.name ?: "Unknown"})\n")
+                                        val studentName = studentMap[it.studentRrn]?.name ?: "Unknown"
+                                        sb.append("- ${it.studentRrn} ($studentName)\n")
                                     }
                                     val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
                                     val clip = android.content.ClipData.newPlainText("Elective Attendance", sb.toString())
@@ -502,8 +511,8 @@ fun ElectiveSetupScreen(
                                     sb.append("*Absentees (${absents.size}):*\n")
                                     if (absents.isEmpty()) sb.append("Nil")
                                     else absents.forEach {
-                                        val student = allStudents.find { s -> s.rrn == it.studentRrn }
-                                        sb.append("- ${it.studentRrn} (${student?.name ?: "Unknown"})\n")
+                                        val studentName = studentMap[it.studentRrn]?.name ?: "Unknown"
+                                        sb.append("- ${it.studentRrn} ($studentName)\n")
                                     }
                                     val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
                                         type = "text/plain"
@@ -521,8 +530,8 @@ fun ElectiveSetupScreen(
                                     try {
                                         val headers = arrayOf("RRN", "Student Name")
                                         val rowData = absents.map { s ->
-                                            val student = allStudents.find { st -> st.rrn == s.studentRrn }
-                                            arrayOf(s.studentRrn, student?.name ?: "Unknown")
+                                            val studentName = studentMap[s.studentRrn]?.name ?: "Unknown"
+                                            arrayOf(s.studentRrn, studentName)
                                         }
                                         val infoList = listOf(
                                             "Elective: $selectedElectiveName",
@@ -649,9 +658,13 @@ fun ElectiveSetupScreen(
             } else {
                 LazyColumn(
                     modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(0.dp)
+                    verticalArrangement = Arrangement.spacedBy(0.dp),
+                    contentPadding = PaddingValues(bottom = 16.dp)
                 ) {
-                    items(filteredStudents.size) { index ->
+                    items(
+                        count = filteredStudents.size,
+                        key = { filteredStudents[it].rrn }
+                    ) { index ->
                         val student = filteredStudents[index]
                         val isChecked = student.rrn in selectedStudentRrns
 

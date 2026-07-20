@@ -580,9 +580,14 @@ private fun Step2RollCall(
         // Student list
         LazyColumn(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(0.dp)
+            verticalArrangement = Arrangement.spacedBy(0.dp),
+            contentPadding = PaddingValues(bottom = 8.dp)
         ) {
-            items(students) { student ->
+            items(
+                count = students.size,
+                key = { students[it].rrn }
+            ) { index ->
+                val student = students[index]
                 val status = attendanceMap[student.rrn] ?: AttendanceStatus.PRESENT
                 val isPresent = status == AttendanceStatus.PRESENT
 

@@ -301,8 +301,9 @@ fun SettingsScreen(
                         scope.launch {
                             try {
                                 val headers = arrayOf("Elective Name", "RRN", "Student Name")
+                                val studentMap = students.associateBy { it.rrn }
                                 val rowData = electiveStudents.map { es ->
-                                    val match = students.find { it.rrn == es.studentRrn }
+                                    val match = studentMap[es.studentRrn]
                                     arrayOf(es.electiveName, es.studentRrn, match?.name ?: "Unknown")
                                 }
                                 val infoList = listOf(
