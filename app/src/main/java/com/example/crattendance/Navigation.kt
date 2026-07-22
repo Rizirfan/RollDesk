@@ -113,12 +113,16 @@ fun MainNavigation(isSetupCompleted: Boolean) {
                         DashboardScreen(
                             viewModel = viewModel,
                             onNavigateToTakeAttendance = { navigateToTop(1) },
-                            onNavigateToElectiveAttendance = {
+                            onNavigateToElectiveAttendance = { electiveName ->
+                                backStack.add(ElectiveAttendance(electiveName))
+                            },
+                            onNavigateToElectiveSetup = {
                                 backStack.add(ElectiveSetup)
                             },
                             onNavigateToStudentList = { navigateToTop(2) },
                             onNavigateToTimetable = { backStack.add(TimetableScreen) },
                             onNavigateToSettings = { backStack.add(SettingsScreen) },
+                            onEditSession = { date, period -> backStack.add(EditAttendance(date, period)) },
                             modifier = Modifier.padding(padding)
                         )
                     }
@@ -157,7 +161,7 @@ fun MainNavigation(isSetupCompleted: Boolean) {
                         isElective = true,
                         electiveName = key.electiveName,
                         onBack = { popBackStack() },
-                        modifier = Modifier
+                        modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
                     )
                 }
                 entry<StudentList> {
@@ -203,6 +207,15 @@ fun MainNavigation(isSetupCompleted: Boolean) {
                             backStack.add(SetupWizard)
                         },
                         modifier = Modifier
+                    )
+                }
+                entry<EditAttendance> { key ->
+                    TakeAttendanceScreen(
+                        viewModel = viewModel,
+                        editDate = key.date,
+                        editPeriod = key.period,
+                        onBack = { popBackStack() },
+                        modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
                     )
                 }
             }

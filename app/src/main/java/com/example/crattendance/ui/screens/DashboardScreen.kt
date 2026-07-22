@@ -13,14 +13,18 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -44,16 +48,19 @@ import java.util.*
 fun DashboardScreen(
     viewModel: CRAttendanceViewModel,
     onNavigateToTakeAttendance: () -> Unit,
-    onNavigateToElectiveAttendance: () -> Unit,
+    onNavigateToElectiveAttendance: (electiveName: String) -> Unit,
+    onNavigateToElectiveSetup: () -> Unit,
     onNavigateToStudentList: () -> Unit,
     onNavigateToTimetable: () -> Unit,
     onNavigateToSettings: () -> Unit,
+    onEditSession: (date: String, period: Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val students by viewModel.students.collectAsState()
     val records by viewModel.attendanceRecords.collectAsState()
     val timetable by viewModel.timetable.collectAsState()
     val electiveRecords by viewModel.electiveAttendanceRecords.collectAsState()
+    val electiveNames by viewModel.electiveNames.collectAsState()
     val context = LocalContext.current
 
     val studentMap = remember(students) {
@@ -67,6 +74,15 @@ fun DashboardScreen(
     var showRosterActionDialog by remember { mutableStateOf(false) }
     var activeExportFile by remember { mutableStateOf<java.io.File?>(null) }
     var exportTitleText by remember { mutableStateOf("") }
+
+    var calendarSelectedDate by remember { mutableStateOf<String?>(null) }
+    var showCalendarDialog by remember { mutableStateOf(false) }
+
+    var showElectivePicker by remember { mutableStateOf(false) }
+    var editingElectiveName by remember { mutableStateOf<String?>(null) }
+    var renameElectiveText by remember { mutableStateOf("") }
+    var showDeleteElectiveDialog by remember { mutableStateOf(false) }
+    var deletingElectiveName by remember { mutableStateOf<String?>(null) }
 
     val todayDate = remember {
         SimpleDateFormat("EEEE, d MMMM", Locale.getDefault()).format(Date())
@@ -144,10 +160,19 @@ fun DashboardScreen(
                             modifier = Modifier.padding(top = 2.dp)
                         )
                     }
-                    IconButton(onClick = onNavigateToTimetable) {
+                    IconButton(onClick = {
+                        val parts = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()).split("-")
+                        android.app.DatePickerDialog(context, { _, y, m, d ->
+                            val cal = Calendar.getInstance()
+                            cal.set(y, m, d)
+                            val picked = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(cal.time)
+                            calendarSelectedDate = picked
+                            showCalendarDialog = true
+                        }, parts[0].toInt(), parts[1].toInt() - 1, parts[2].toInt()).show()
+                    }) {
                         Icon(
-                            imageVector = Icons.Default.CalendarToday,
-                            contentDescription = "Timetable",
+                            imageVector = Icons.Filled.DateRange,
+                            contentDescription = "Calendar",
                             tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -228,42 +253,49 @@ fun DashboardScreen(
                 Spacer(modifier = Modifier.height(10.dp))
                 Surface(
                     shape = RoundedCornerShape(12.dp),
-                    color = com.example.crattendance.theme.Elective,
+                    color = MaterialTheme.colorScheme.surfaceContainerLow,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { onNavigateToElectiveAttendance() }
+                        .clickable { showElectivePicker = true }
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 14.dp),
+                            .padding(horizontal = 14.dp, vertical = 14.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.CheckCircle,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier.size(22.dp)
-                        )
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(com.example.crattendance.theme.Elective.copy(alpha = 0.12f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.CheckCircle,
+                                contentDescription = null,
+                                tint = com.example.crattendance.theme.Elective,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
                         Spacer(modifier = Modifier.width(12.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 "Elective Attendance",
                                 style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onPrimary
+                                fontWeight = FontWeight.SemiBold
                             )
                             Text(
                                 "Track elective subject roll calls",
                                 style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.75f)
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         Icon(
                             imageVector = Icons.Default.TrendingUp,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f),
-                            modifier = Modifier.size(18.dp)
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                            modifier = Modifier.size(16.dp)
                         )
                     }
                 }
@@ -591,7 +623,7 @@ fun DashboardScreen(
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
                             OutlinedButton(
                                 onClick = {
@@ -613,8 +645,13 @@ fun DashboardScreen(
                                     Toast.makeText(context, "Copied to clipboard", Toast.LENGTH_SHORT).show()
                                 },
                                 modifier = Modifier.weight(1f),
-                                shape = RoundedCornerShape(8.dp)
-                            ) { Text("Copy", style = MaterialTheme.typography.labelSmall) }
+                                shape = RoundedCornerShape(8.dp),
+                                contentPadding = PaddingValues(vertical = 6.dp)
+                            ) {
+                                Icon(imageVector = Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(14.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Copy", style = MaterialTheme.typography.labelSmall)
+                            }
 
                             OutlinedButton(
                                 onClick = {
@@ -637,8 +674,13 @@ fun DashboardScreen(
                                     context.startActivity(Intent.createChooser(intent, "Share Report"))
                                 },
                                 modifier = Modifier.weight(1f),
-                                shape = RoundedCornerShape(8.dp)
-                            ) { Text("Share", style = MaterialTheme.typography.labelSmall) }
+                                shape = RoundedCornerShape(8.dp),
+                                contentPadding = PaddingValues(vertical = 6.dp)
+                            ) {
+                                Icon(imageVector = Icons.Default.Share, contentDescription = null, modifier = Modifier.size(14.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Share", style = MaterialTheme.typography.labelSmall)
+                            }
 
                             OutlinedButton(
                                 onClick = {
@@ -677,7 +719,8 @@ fun DashboardScreen(
                                     }
                                 },
                                 modifier = Modifier.weight(1f),
-                                shape = RoundedCornerShape(8.dp)
+                                shape = RoundedCornerShape(8.dp),
+                                contentPadding = PaddingValues(vertical = 6.dp)
                             ) {
                                 Icon(imageVector = Icons.Default.PictureAsPdf, contentDescription = null, modifier = Modifier.size(14.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
@@ -687,7 +730,8 @@ fun DashboardScreen(
                             Button(
                                 onClick = { selectedElectiveSession = null },
                                 modifier = Modifier.weight(1.2f),
-                                shape = RoundedCornerShape(8.dp)
+                                shape = RoundedCornerShape(8.dp),
+                                contentPadding = PaddingValues(vertical = 6.dp)
                             ) { Text("Close", style = MaterialTheme.typography.labelSmall) }
                         }
                     }
@@ -885,6 +929,20 @@ fun DashboardScreen(
 
                             OutlinedButton(
                                 onClick = {
+                                    onEditSession(first.date, first.period)
+                                    selectedSession = null
+                                },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(8.dp),
+                                contentPadding = PaddingValues(vertical = 6.dp)
+                            ) {
+                                Icon(imageVector = Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(14.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Edit", style = MaterialTheme.typography.labelSmall)
+                            }
+
+                            OutlinedButton(
+                                onClick = {
                                     val absents = session.filter { it.status == "Absent" }
                                     val headers = arrayOf("RRN", "Student Name")
                                     val rowData = absents.map { r ->
@@ -954,6 +1012,258 @@ fun DashboardScreen(
                 TextButton(onClick = { showDeleteDialog = false; sessionToDelete = null }) { Text("Cancel") }
             }
         )
+    }
+
+    // Elective picker dialog
+    if (showElectivePicker) {
+        AlertDialog(
+            onDismissRequest = { showElectivePicker = false },
+            title = { Text("Select Elective") },
+            text = {
+                if (electiveNames.isEmpty()) {
+                    Text("No electives configured yet.")
+                } else {
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        electiveNames.forEach { name ->
+                            val recordCount = electiveRecords.count { it.electiveName == name }
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = MaterialTheme.colorScheme.surfaceContainerLow,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        showElectivePicker = false
+                                        onNavigateToElectiveAttendance(name)
+                                    }
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(start = 14.dp, end = 4.dp, top = 12.dp, bottom = 12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = name,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                        if (recordCount > 0) {
+                                            Text(
+                                                text = "$recordCount records",
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
+                                    IconButton(onClick = {
+                                        editingElectiveName = name
+                                        renameElectiveText = name
+                                        showElectivePicker = false
+                                    }, modifier = Modifier.size(32.dp)) {
+                                        Icon(imageVector = Icons.Default.Edit, contentDescription = "Rename", modifier = Modifier.size(16.dp))
+                                    }
+                                    IconButton(onClick = {
+                                        deletingElectiveName = name
+                                        showDeleteElectiveDialog = true
+                                        showElectivePicker = false
+                                    }, modifier = Modifier.size(32.dp)) {
+                                        Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(16.dp))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Row {
+                    TextButton(onClick = { showElectivePicker = false; onNavigateToElectiveSetup() }) {
+                        Icon(imageVector = Icons.Default.Add, contentDescription = null, modifier = Modifier.size(14.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Add")
+                    }
+                    TextButton(onClick = { showElectivePicker = false }) { Text("Cancel") }
+                }
+            }
+        )
+    }
+
+    // Rename elective dialog
+    if (editingElectiveName != null) {
+        AlertDialog(
+            onDismissRequest = { editingElectiveName = null },
+            title = { Text("Rename Elective") },
+            text = {
+                OutlinedTextField(
+                    value = renameElectiveText,
+                    onValueChange = { renameElectiveText = it },
+                    label = { Text("Elective Name") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp)
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val newName = renameElectiveText.trim()
+                        if (newName.isNotEmpty() && newName != editingElectiveName) {
+                            viewModel.renameElective(editingElectiveName!!, newName)
+                            Toast.makeText(context, "Renamed to $newName", Toast.LENGTH_SHORT).show()
+                        }
+                        editingElectiveName = null
+                    }
+                ) { Text("Rename") }
+            },
+            dismissButton = {
+                TextButton(onClick = { editingElectiveName = null }) { Text("Cancel") }
+            }
+        )
+    }
+
+    // Delete elective confirmation dialog
+    if (showDeleteElectiveDialog && deletingElectiveName != null) {
+        AlertDialog(
+            onDismissRequest = { showDeleteElectiveDialog = false; deletingElectiveName = null },
+            title = { Text("Delete Elective?") },
+            text = { Text("Delete \"$deletingElectiveName\" and all its attendance records? This cannot be undone.") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.deleteElective(deletingElectiveName!!)
+                        showDeleteElectiveDialog = false
+                        deletingElectiveName = null
+                        Toast.makeText(context, "Elective deleted", Toast.LENGTH_SHORT).show()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) { Text("Delete") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteElectiveDialog = false; deletingElectiveName = null }) { Text("Cancel") }
+            }
+        )
+    }
+
+    // Calendar date attendance dialog
+    if (showCalendarDialog && calendarSelectedDate != null) {
+        val dateRecords = records.filter { it.date == calendarSelectedDate }
+        val groupedByPeriod = dateRecords.groupBy { it.period }.toSortedMap()
+
+        Dialog(
+            onDismissRequest = { showCalendarDialog = false; calendarSelectedDate = null },
+            properties = DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.4f))
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+                    ) { showCalendarDialog = false; calendarSelectedDate = null },
+                contentAlignment = Alignment.Center
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+                        ) {}
+                ) {
+                    Column(modifier = Modifier.padding(18.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = calendarSelectedDate!!,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            IconButton(onClick = { showCalendarDialog = false; calendarSelectedDate = null }, modifier = Modifier.size(28.dp)) {
+                                Icon(imageVector = Icons.Default.Close, contentDescription = "Close", modifier = Modifier.size(18.dp))
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "${dateRecords.size} records across ${groupedByPeriod.size} periods",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        if (dateRecords.isEmpty()) {
+                            Box(
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    "No attendance records for this date",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        } else {
+                            Column(modifier = Modifier.heightIn(max = 400.dp).verticalScroll(rememberScrollState())) {
+                                groupedByPeriod.forEach { (period, periodRecords) ->
+                                    val first = periodRecords.first()
+                                    val presentCount = periodRecords.count { it.status == "Present" }
+                                    val absentCount = periodRecords.count { it.status == "Absent" }
+
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clip(RoundedCornerShape(6.dp))
+                                            .clickable {
+                                                selectedSession = periodRecords
+                                                showCalendarDialog = false
+                                                calendarSelectedDate = null
+                                            }
+                                            .padding(vertical = 8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text(
+                                                text = first.subject,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                            Text(
+                                                text = "Period $period",
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                            Text(
+                                                text = "$presentCount P",
+                                                style = MaterialTheme.typography.labelSmall,
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = com.example.crattendance.theme.StatusPresent
+                                            )
+                                            Text(
+                                                text = "$absentCount A",
+                                                style = MaterialTheme.typography.labelSmall,
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = com.example.crattendance.theme.StatusAbsent
+                                            )
+                                        }
+                                    }
+
+                                    if (period != groupedByPeriod.keys.last()) {
+                                        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     if (showRosterActionDialog && activeExportFile != null) {

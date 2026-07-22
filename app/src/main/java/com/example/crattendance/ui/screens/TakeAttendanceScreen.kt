@@ -47,6 +47,8 @@ fun TakeAttendanceScreen(
     viewModel: CRAttendanceViewModel,
     isElective: Boolean = false,
     electiveName: String? = null,
+    editDate: String? = null,
+    editPeriod: Int? = null,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -54,6 +56,9 @@ fun TakeAttendanceScreen(
     val allStudents by viewModel.students.collectAsState()
     val electiveStudents by viewModel.electiveStudents.collectAsState()
     val timetable by viewModel.timetable.collectAsState()
+    val allAttendanceRecords by viewModel.attendanceRecords.collectAsState()
+
+    val isEditMode = editDate != null && editPeriod != null
 
     val students = remember(allStudents, electiveStudents, isElective, electiveName) {
         if (isElective && !electiveName.isNullOrEmpty()) {
@@ -67,7 +72,7 @@ fun TakeAttendanceScreen(
         }
     }
 
-    var currentStep by remember { mutableIntStateOf(1) }
+    var currentStep by remember { mutableIntStateOf(if (isEditMode || isElective) 2 else 1) }
 
     BackHandler(enabled = currentStep > 1) {
         currentStep--
@@ -79,7 +84,7 @@ fun TakeAttendanceScreen(
 
     val calendar = remember { Calendar.getInstance() }
     var selectedDateStr by remember {
-        mutableStateOf(SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()))
+        mutableStateOf(editDate ?: SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()))
     }
 
     val dayOfWeek = remember(selectedDateStr) {
@@ -107,21 +112,48 @@ fun TakeAttendanceScreen(
     }
 
     var selectedPeriodIndex by remember { mutableIntStateOf(0) }
-    var selectedPeriodNum by remember { mutableIntStateOf(1) }
+    var selectedPeriodNum by remember { mutableIntStateOf(editPeriod ?: 1) }
     var selectedSubjectName by remember { mutableStateOf(if (isElective) "Linux" else "Period") }
 
     val attendanceMap = remember { mutableStateMapOf<String, AttendanceStatus>() }
 
-    LaunchedEffect(students) {
-        students.forEach { s ->
-            if (!attendanceMap.containsKey(s.rrn)) {
-                attendanceMap[s.rrn] = AttendanceStatus.PRESENT
+    LaunchedEffect(students, isEditMode, editDate, editPeriod) {
+        if (isEditMode && editDate != null && editPeriod != null) {
+            val existingRecords = allAttendanceRecords.filter {
+                it.date == editDate && it.period == editPeriod
+            }
+            students.forEach { s ->
+                val record = existingRecords.find { it.studentRrn == s.rrn }
+                if (record != null) {
+                    attendanceMap[s.rrn] = when (record.status) {
+                        "Present" -> AttendanceStatus.PRESENT
+                        "Absent" -> AttendanceStatus.ABSENT
+                        "Medical Leave" -> AttendanceStatus.MEDICAL_LEAVE
+                        "On Duty" -> AttendanceStatus.ON_DUTY
+                        "Late" -> AttendanceStatus.LATE
+                        else -> AttendanceStatus.PRESENT
+                    }
+                } else {
+                    attendanceMap[s.rrn] = AttendanceStatus.PRESENT
+                }
+            }
+            if (existingRecords.isNotEmpty()) {
+                selectedSubjectName = existingRecords.first().subject
+                selectedPeriodNum = editPeriod
+                val idx = todayPeriods.indexOfFirst { it.period == editPeriod }
+                if (idx >= 0) selectedPeriodIndex = idx
+            }
+        } else {
+            students.forEach { s ->
+                if (!attendanceMap.containsKey(s.rrn)) {
+                    attendanceMap[s.rrn] = AttendanceStatus.PRESENT
+                }
             }
         }
     }
 
     LaunchedEffect(todayPeriods, selectedPeriodIndex) {
-        if (!isElective) {
+        if (!isElective && !isEditMode) {
             if (todayPeriods.isNotEmpty() && selectedPeriodIndex < todayPeriods.size) {
                 selectedSubjectName = todayPeriods[selectedPeriodIndex].subjectName
                 selectedPeriodNum = todayPeriods[selectedPeriodIndex].period
@@ -146,7 +178,7 @@ fun TakeAttendanceScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 4.dp),
+                .padding(top = 12.dp, bottom = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = {
@@ -154,42 +186,50 @@ fun TakeAttendanceScreen(
             }) {
                 Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
+            Spacer(modifier = Modifier.width(4.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = if (isElective) "Elective Attendance" else if (currentStep == 1) "Session Setup" else "Roll Call",
+                    text = if (isEditMode) "Edit Attendance"
+                           else if (isElective) "Elective Roll Call"
+                           else if (currentStep == 1) "Session Setup" else "Roll Call",
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
                 )
                 Text(
-                    text = "Step $currentStep of 2",
+                    text = if (isEditMode) "Editing $selectedDateStr \u00B7 Period $selectedPeriodNum"
+                           else if (isElective) "${electiveName ?: ""} \u00B7 Step $currentStep of 2"
+                           else "Step $currentStep of 2",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1
                 )
             }
-            // Step indicator dots in right corner
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(end = 8.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(8.dp)
-                        .clip(CircleShape)
-                        .background(if (currentStep >= 1) Teal else MaterialTheme.colorScheme.outline)
-                )
-                Box(
-                    modifier = Modifier
-                        .width(16.dp)
-                        .height(2.dp)
-                        .background(if (currentStep >= 2) Teal else MaterialTheme.colorScheme.outline)
-                )
-                Box(
-                    modifier = Modifier
-                        .size(8.dp)
-                        .clip(CircleShape)
-                        .background(if (currentStep >= 2) Teal else MaterialTheme.colorScheme.outline)
-                )
+            if (!isElective) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(end = 8.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(if (currentStep >= 1) Teal else MaterialTheme.colorScheme.outline)
+                    )
+                    Box(
+                        modifier = Modifier
+                            .width(16.dp)
+                            .height(2.dp)
+                            .background(if (currentStep >= 2) Teal else MaterialTheme.colorScheme.outline)
+                    )
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(if (currentStep >= 2) Teal else MaterialTheme.colorScheme.outline)
+                    )
+                }
             }
         }
 
@@ -306,6 +346,9 @@ fun TakeAttendanceScreen(
                                 timestamp = timestamp
                             )
                         }
+                        if (isEditMode) {
+                            viewModel.deleteElectiveAttendanceForDateAndElective(selectedDateStr, electiveName)
+                        }
                         viewModel.saveElectiveAttendance(recordList)
                     } else {
                         val recordList = students.map { s ->
@@ -318,9 +361,12 @@ fun TakeAttendanceScreen(
                                 timestamp = timestamp
                             )
                         }
+                        if (isEditMode) {
+                            viewModel.deletePeriodAttendance(selectedDateStr, selectedPeriodNum)
+                        }
                         viewModel.saveAttendance(recordList)
                     }
-                    Toast.makeText(context, "Attendance saved", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, if (isEditMode) "Attendance updated" else "Attendance saved", Toast.LENGTH_SHORT).show()
                     onBack()
                 },
                 onShareText = {

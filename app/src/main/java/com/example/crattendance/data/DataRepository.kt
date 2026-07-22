@@ -112,6 +112,10 @@ class DataRepository @Inject constructor(
     suspend fun deleteElective(electiveName: String) = withContext(Dispatchers.IO) {
         electiveStudentDao.deleteElective(electiveName)
     }
+    suspend fun renameElective(oldName: String, newName: String) = withContext(Dispatchers.IO) {
+        electiveStudentDao.renameElective(oldName, newName)
+        electiveAttendanceDao.renameElective(oldName, newName)
+    }
     suspend fun deleteAllElectiveStudents() = withContext(Dispatchers.IO) {
         electiveStudentDao.deleteAll()
     }

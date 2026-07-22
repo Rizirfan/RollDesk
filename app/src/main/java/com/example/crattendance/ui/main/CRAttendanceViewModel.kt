@@ -179,6 +179,12 @@ class CRAttendanceViewModel @Inject constructor(
         }
     }
 
+    fun renameElective(oldName: String, newName: String) {
+        viewModelScope.launch {
+            repository.renameElective(oldName, newName)
+        }
+    }
+
     fun saveElectiveAttendance(records: List<ElectiveAttendanceRecordEntity>) {
         viewModelScope.launch {
             repository.saveElectiveAttendanceRecords(records)

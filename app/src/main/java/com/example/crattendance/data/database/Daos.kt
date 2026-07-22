@@ -125,6 +125,9 @@ interface ElectiveStudentDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(electiveStudents: List<ElectiveStudentEntity>)
 
+    @Query("UPDATE elective_students SET electiveName = :newName WHERE electiveName = :oldName")
+    fun renameElective(oldName: String, newName: String)
+
     @Query("DELETE FROM elective_students WHERE electiveName = :electiveName")
     fun deleteElective(electiveName: String)
 
@@ -151,6 +154,9 @@ interface ElectiveAttendanceDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(records: List<ElectiveAttendanceRecordEntity>)
+
+    @Query("UPDATE elective_attendance_records SET electiveName = :newName WHERE electiveName = :oldName")
+    fun renameElective(oldName: String, newName: String)
 
     @Query("DELETE FROM elective_attendance_records WHERE date = :date AND electiveName = :electiveName")
     fun deleteRecordsForDateAndElective(date: String, electiveName: String)

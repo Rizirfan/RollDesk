@@ -12,3 +12,4 @@ import kotlinx.serialization.Serializable
 @Serializable data class StudentDetails(val rrn: String) : NavKey
 @Serializable data object TimetableScreen : NavKey
 @Serializable data object SettingsScreen : NavKey
+@Serializable data class EditAttendance(val date: String, val period: Int) : NavKey
