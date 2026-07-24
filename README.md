@@ -14,7 +14,7 @@ A modern Android attendance management app built for Class Representatives to ta
 
 ---
 
-[Download APK (v1.4.0)](built_apks/app-debug-v1.4.0.apk) | [Documentation](DOCUMENTATION.md) | [Report Issue](https://github.com/Rizirfan/RollDesk/issues)
+[Download APK (v1.4.0)](https://github.com/Rizirfan/RollDesk/releases/download/v1.4.0/app-debug-v1.4.0.apk) | [Documentation](DOCUMENTATION.md) | [Report Issue](https://github.com/Rizirfan/RollDesk/issues)
 
 </div>
 
@@ -41,9 +41,9 @@ A modern Android attendance management app built for Class Representatives to ta
 
 ## Download
 
-Get the latest release directly from GitHub or local build:
+Get the latest release directly from GitHub:
 
-**[Download RollDesk APK (v1.4.0)](built_apks/app-debug-v1.4.0.apk)**
+**[Download RollDesk APK (v1.4.0)](https://github.com/Rizirfan/RollDesk/releases/download/v1.4.0/app-debug-v1.4.0.apk)**
 
 > Requires Android 8.0 (API 26) or higher. Enable **Install from unknown sources** in your device settings to install the APK.
 
