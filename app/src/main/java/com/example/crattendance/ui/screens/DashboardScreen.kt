@@ -270,6 +270,7 @@ fun DashboardScreen(
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(com.example.crattendance.theme.Elective.copy(alpha = 0.12f)),
                             contentAlignment = Alignment.Center
+            
                         ) {
                             Icon(
                                 imageVector = Icons.Default.CheckCircle,
@@ -806,7 +807,7 @@ fun DashboardScreen(
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(first.subject, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
                                 Text(
-                                    "${first.date}  \u00B7  Period ${first.period}",
+                                    "${first.date}  \u00B7  P${first.period}",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -871,7 +872,7 @@ fun DashboardScreen(
                                 onClick = {
                                     val sb = StringBuilder()
                                     sb.appendLine(first.subject)
-                                    sb.appendLine("${first.date}  \u00B7  Period ${first.period}")
+                                    sb.appendLine("${first.date}  \u00B7  P${first.period}")
                                     sb.appendLine()
                                     if (presentStudents.isNotEmpty()) {
                                         sb.appendLine("Present (${presentStudents.size}):")
@@ -951,7 +952,7 @@ fun DashboardScreen(
                                     }
                                     val infoList = listOf(
                                         "Date: ${first.date}",
-                                        "Period: ${first.period}",
+                                        "Period: P${first.period}",
                                         "Subject: ${first.subject}",
                                         "Present: ${presentStudents.size}",
                                         "Absent: ${absentStudents.size}"
@@ -996,7 +997,7 @@ fun DashboardScreen(
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false; sessionToDelete = null },
             title = { Text("Delete Record?") },
-            text = { Text("Delete attendance for ${first.subject} on ${first.date}, Period ${first.period}? This cannot be undone.") },
+            text = { Text("Delete attendance for ${first.subject} on ${first.date}, P${first.period}? This cannot be undone.") },
             confirmButton = {
                 Button(
                     onClick = {
@@ -1233,7 +1234,7 @@ fun DashboardScreen(
                                                 fontWeight = FontWeight.Medium
                                             )
                                             Text(
-                                                text = "Period $period",
+                                                text = "P$period",
                                                 style = MaterialTheme.typography.labelSmall,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )

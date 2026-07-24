@@ -67,6 +67,9 @@ interface TimetableDao {
 
     @Query("DELETE FROM timetable WHERE dayOfWeek = :dayOfWeek")
     fun deleteTimetableForDay(dayOfWeek: Int)
+
+    @Query("DELETE FROM timetable WHERE period > :maxPeriod")
+    fun deletePeriodsGreaterThan(maxPeriod: Int)
 }
 
 @Dao

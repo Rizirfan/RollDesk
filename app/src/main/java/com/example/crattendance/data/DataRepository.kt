@@ -36,6 +36,9 @@ class DataRepository @Inject constructor(
     suspend fun saveStudent(student: StudentEntity) = withContext(Dispatchers.IO) {
         studentDao.insert(student)
     }
+    suspend fun updateStudent(student: StudentEntity) = withContext(Dispatchers.IO) {
+        studentDao.update(student)
+    }
     suspend fun saveAllStudents(students: List<StudentEntity>) = withContext(Dispatchers.IO) {
         studentDao.insertAll(students)
     }
@@ -63,6 +66,9 @@ class DataRepository @Inject constructor(
     }
     suspend fun deleteTimetableForDay(dayOfWeek: Int) = withContext(Dispatchers.IO) {
         timetableDao.deleteTimetableForDay(dayOfWeek)
+    }
+    suspend fun deleteTimetablePeriodsGreaterThan(maxPeriod: Int) = withContext(Dispatchers.IO) {
+        timetableDao.deletePeriodsGreaterThan(maxPeriod)
     }
     suspend fun deleteAllTimetable() = withContext(Dispatchers.IO) {
         timetableDao.deleteAll()

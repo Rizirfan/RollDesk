@@ -8,6 +8,8 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -56,6 +58,7 @@ fun TakeAttendanceScreen(
     val allStudents by viewModel.students.collectAsState()
     val electiveStudents by viewModel.electiveStudents.collectAsState()
     val timetable by viewModel.timetable.collectAsState()
+    val periodsPerDay by viewModel.periodsPerDay.collectAsState()
     val allAttendanceRecords by viewModel.attendanceRecords.collectAsState()
 
     val isEditMode = editDate != null && editPeriod != null
@@ -107,8 +110,10 @@ fun TakeAttendanceScreen(
         } catch (_: Exception) { 1 }
     }
 
-    val todayPeriods = remember(timetable, dayOfWeek) {
-        timetable.filter { it.dayOfWeek == dayOfWeek }.sortedBy { it.period }
+    val todayPeriods = remember(timetable, dayOfWeek, periodsPerDay) {
+        timetable
+            .filter { it.dayOfWeek == dayOfWeek && it.period <= periodsPerDay }
+            .sortedBy { it.period }
     }
 
     var selectedPeriodIndex by remember { mutableIntStateOf(0) }
@@ -152,14 +157,16 @@ fun TakeAttendanceScreen(
         }
     }
 
-    LaunchedEffect(todayPeriods, selectedPeriodIndex) {
+    LaunchedEffect(todayPeriods, selectedPeriodIndex, periodsPerDay) {
         if (!isElective && !isEditMode) {
             if (todayPeriods.isNotEmpty() && selectedPeriodIndex < todayPeriods.size) {
                 selectedSubjectName = todayPeriods[selectedPeriodIndex].subjectName
                 selectedPeriodNum = todayPeriods[selectedPeriodIndex].period
             } else {
-                selectedPeriodNum = selectedPeriodIndex + 1
-                selectedSubjectName = "Period $selectedPeriodNum"
+                val safeIndex = selectedPeriodIndex.coerceIn(0, periodsPerDay - 1)
+                if (safeIndex != selectedPeriodIndex) selectedPeriodIndex = safeIndex
+                selectedPeriodNum = safeIndex + 1
+                selectedSubjectName = "P$selectedPeriodNum"
             }
         }
     }
@@ -197,7 +204,7 @@ fun TakeAttendanceScreen(
                     maxLines = 1
                 )
                 Text(
-                    text = if (isEditMode) "Editing $selectedDateStr \u00B7 Period $selectedPeriodNum"
+                    text = if (isEditMode) "Editing $selectedDateStr \u00B7 P$selectedPeriodNum"
                            else if (isElective) "${electiveName ?: ""} \u00B7 Step $currentStep of 2"
                            else "Step $currentStep of 2",
                     style = MaterialTheme.typography.bodySmall,
@@ -309,6 +316,7 @@ fun TakeAttendanceScreen(
                 selectedDateStr = selectedDateStr,
                 onDateChange = { selectedDateStr = it },
                 todayPeriods = todayPeriods,
+                periodsPerDay = periodsPerDay,
                 selectedPeriodIndex = selectedPeriodIndex,
                 onPeriodSelect = { idx, period, subject ->
                     selectedPeriodIndex = idx
@@ -373,7 +381,7 @@ fun TakeAttendanceScreen(
                     val sb = StringBuilder()
                     sb.append("*Attendance Report*\n")
                     sb.append("Date: $selectedDateStr\n")
-                    sb.append("Period: $selectedPeriodNum ($selectedSubjectName)\n\n")
+                    sb.append("Period: P$selectedPeriodNum ($selectedSubjectName)\n\n")
                     sb.append("*Absentees ($absentCount):*\n")
                     val absents = students.filter { attendanceMap[it.rrn] == AttendanceStatus.ABSENT }
                     if (absents.isEmpty()) sb.append("Nil")
@@ -394,7 +402,7 @@ fun TakeAttendanceScreen(
                         }
                         val infoList = listOf(
                             "Date: $selectedDateStr",
-                            "Period: $selectedPeriodNum",
+                            "Period: P$selectedPeriodNum",
                             "Subject: $selectedSubjectName",
                             "Total Students: ${students.size}",
                             "Present: $presentCount",
@@ -485,6 +493,7 @@ private fun Step1SessionSetup(
     selectedDateStr: String,
     onDateChange: (String) -> Unit,
     todayPeriods: List<com.example.crattendance.data.database.TimetableEntity>,
+    periodsPerDay: Int,
     selectedPeriodIndex: Int,
     onPeriodSelect: (index: Int, period: Int, subject: String) -> Unit,
     subjectName: String,
@@ -526,41 +535,65 @@ private fun Step1SessionSetup(
             }
         }
 
-        // Period label
         Text(
             if (todayPeriods.isEmpty()) "Pick a period:" else "Period",
             style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.SemiBold
         )
 
-        // Period chips - equal weight grid
+        // Period chips - scrollable grid with selection indicator color
         if (todayPeriods.isEmpty()) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                (1..6).forEach { pNum ->
+                (1..periodsPerDay).forEach { pNum ->
+                    val isSelected = selectedPeriodIndex == (pNum - 1)
                     FilterChip(
-                        selected = selectedPeriodIndex == (pNum - 1),
-                        onClick = { onPeriodSelect(pNum - 1, pNum, "Period $pNum") },
-                        label = { Text("P$pNum", style = MaterialTheme.typography.labelSmall) },
+                        selected = isSelected,
+                        onClick = { onPeriodSelect(pNum - 1, pNum, "P$pNum") },
+                        label = { 
+                            Text(
+                                text = "P$pNum", 
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                            ) 
+                        },
                         shape = RoundedCornerShape(6.dp),
-                        modifier = Modifier.weight(1f)
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = com.example.crattendance.theme.Teal,
+                            selectedLabelColor = Color.White
+                        )
                     )
                 }
             }
         } else {
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 todayPeriods.forEachIndexed { idx, p ->
+                    val isSelected = idx == selectedPeriodIndex
                     FilterChip(
-                        selected = idx == selectedPeriodIndex,
+                        selected = isSelected,
                         onClick = { onPeriodSelect(idx, p.period, p.subjectName) },
-                        label = { Text("P${p.period}", style = MaterialTheme.typography.labelSmall, maxLines = 1) },
+                        label = { 
+                            Text(
+                                text = "P${p.period}", 
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                maxLines = 1
+                            ) 
+                        },
                         shape = RoundedCornerShape(6.dp),
-                        modifier = Modifier.weight(1f)
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = com.example.crattendance.theme.Teal,
+                            selectedLabelColor = Color.White
+                        )
                     )
                 }
             }

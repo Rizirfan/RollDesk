@@ -48,6 +48,9 @@ class CRAttendanceViewModel @Inject constructor(
     val themeMode: StateFlow<Int> = preferences.themeMode
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
+    val periodsPerDay: StateFlow<Int> = preferences.periodsPerDay
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 6)
+
     // Elective StateFlows
     val electiveNames: StateFlow<List<String>> = repository.allElectiveNames
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -61,6 +64,18 @@ class CRAttendanceViewModel @Inject constructor(
     fun setThemeMode(mode: Int) {
         viewModelScope.launch {
             preferences.setThemeMode(mode)
+        }
+    }
+
+    fun setPeriodsPerDay(periods: Int) {
+        viewModelScope.launch {
+            val normalized = when (periods) {
+                7 -> 7
+                8 -> 8
+                else -> 6
+            }
+            preferences.setPeriodsPerDay(normalized)
+            repository.deleteTimetablePeriodsGreaterThan(normalized)
         }
     }
 
@@ -108,6 +123,30 @@ class CRAttendanceViewModel @Inject constructor(
         viewModelScope.launch {
             if (rrn.trim().isNotEmpty() && name.trim().isNotEmpty()) {
                 repository.saveStudent(StudentEntity(rrn.trim(), name.trim(), phone?.trim(), notes?.trim()))
+            }
+        }
+    }
+
+    fun addBulkStudents(csvData: String) {
+        viewModelScope.launch {
+            val parsed = BackupHelper.parseCSVStudents(csvData)
+            if (parsed.isNotEmpty()) {
+                repository.saveAllStudents(parsed)
+            }
+        }
+    }
+
+    fun updateStudent(student: StudentEntity) {
+        viewModelScope.launch {
+            if (student.rrn.trim().isNotEmpty() && student.name.trim().isNotEmpty()) {
+                repository.updateStudent(
+                    student.copy(
+                        rrn = student.rrn.trim(),
+                        name = student.name.trim(),
+                        phone = student.phone?.trim(),
+                        notes = student.notes?.trim()
+                    )
+                )
             }
         }
     }

@@ -39,11 +39,12 @@ fun TimetableScreen(
     modifier: Modifier = Modifier
 ) {
     val timetable by viewModel.timetable.collectAsState()
+    val periodsPerDay by viewModel.periodsPerDay.collectAsState()
     var selectedDay by remember { mutableIntStateOf(1) }
     var isEditing by remember { mutableStateOf(false) }
 
     val daysOfWeek = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
-    val periods = (1..6).toList()
+    val periods = remember(periodsPerDay) { (1..periodsPerDay).toList() }
     val context = LocalContext.current
 
     val timetablePdfPath by viewModel.timetablePdfPath.collectAsState()
@@ -70,8 +71,8 @@ fun TimetableScreen(
         }
     }
 
-    val activeTimetable = remember(timetable, selectedDay) {
-        timetable.filter { it.dayOfWeek == selectedDay }
+    val activeTimetable = remember(timetable, selectedDay, periodsPerDay) {
+        timetable.filter { it.dayOfWeek == selectedDay && it.period <= periodsPerDay }
     }
 
     val editFields = remember(activeTimetable, isEditing) {
@@ -134,6 +135,28 @@ fun TimetableScreen(
                         selected = selectedDay == idx + 1,
                         onClick = { selectedDay = idx + 1 },
                         text = { Text(name, fontWeight = FontWeight.SemiBold) }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+                "Periods per day",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                listOf(6, 7, 8).forEach { option ->
+                    FilterChip(
+                        selected = periodsPerDay == option,
+                        onClick = { viewModel.setPeriodsPerDay(option) },
+                        label = { Text("$option Hours") }
                     )
                 }
             }

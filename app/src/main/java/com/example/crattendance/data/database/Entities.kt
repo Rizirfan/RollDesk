@@ -27,7 +27,7 @@ data class StudentEntity(
 data class TimetableEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val dayOfWeek: Int, // 1 = Monday, 2 = Tuesday, ..., 7 = Sunday (typically Mon-Fri)
-    val period: Int, // 1 to 6
+    val period: Int, // 1 to selected periods-per-day (6/7/8)
     val subjectName: String
 )
 

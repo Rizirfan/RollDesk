@@ -23,6 +23,7 @@ class AppPreferences @Inject constructor(
         val REMINDER_MINUTE = intPreferencesKey("reminder_minute")
         val TIMETABLE_PDF_PATH = stringPreferencesKey("timetable_pdf_path")
         val THEME_MODE = intPreferencesKey("theme_mode") // 0=System, 1=Light, 2=Dark
+        val PERIODS_PER_DAY = intPreferencesKey("periods_per_day") // Allowed: 6, 7, 8
     }
 
     val isSetupCompleted: Flow<Boolean> = context.dataStore.data.map { preferences ->
@@ -63,9 +64,24 @@ class AppPreferences @Inject constructor(
         preferences[THEME_MODE] ?: 0
     }
 
+    val periodsPerDay: Flow<Int> = context.dataStore.data.map { preferences ->
+        val value = preferences[PERIODS_PER_DAY] ?: 6
+        if (value in 6..8) value else 6
+    }
+
     suspend fun setThemeMode(mode: Int) {
         context.dataStore.edit { preferences ->
             preferences[THEME_MODE] = mode
+        }
+    }
+
+    suspend fun setPeriodsPerDay(periods: Int) {
+        context.dataStore.edit { preferences ->
+            preferences[PERIODS_PER_DAY] = when (periods) {
+                7 -> 7
+                8 -> 8
+                else -> 6
+            }
         }
     }
 }

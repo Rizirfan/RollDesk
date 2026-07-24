@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -26,6 +27,7 @@ fun StudentDetailsScreen(
 ) {
     val students by viewModel.students.collectAsState()
     val records by viewModel.attendanceRecords.collectAsState()
+    var showEditDialog by remember { mutableStateOf(false) }
 
     val student = remember(students, rrn) { students.find { it.rrn == rrn } }
     val studentRecords = remember(records, rrn) { records.filter { it.studentRrn == rrn } }
@@ -44,6 +46,13 @@ fun StudentDetailsScreen(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    if (student != null) {
+                        IconButton(onClick = { showEditDialog = true }) {
+                            Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit Student")
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
@@ -98,6 +107,17 @@ fun StudentDetailsScreen(
             Spacer(modifier = Modifier.height(32.dp))
         }
     }
+
+    if (showEditDialog && student != null) {
+        EditStudentDialog(
+            student = student,
+            onDismiss = { showEditDialog = false },
+            onSave = { updatedStudent ->
+                viewModel.updateStudent(updatedStudent)
+                showEditDialog = false
+            }
+        )
+    }
 }
 
 @Composable
@@ -111,4 +131,78 @@ private fun DetailStatRow(label: String, value: String, valueColor: androidx.com
         Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = valueColor)
     }
+}
+
+@Composable
+private fun EditStudentDialog(
+    student: com.example.crattendance.data.database.StudentEntity,
+    onDismiss: () -> Unit,
+    onSave: (com.example.crattendance.data.database.StudentEntity) -> Unit
+) {
+    var name by remember(student) { mutableStateOf(student.name) }
+    var phone by remember(student) { mutableStateOf(student.phone.orEmpty()) }
+    var notes by remember(student) { mutableStateOf(student.notes.orEmpty()) }
+    var errorText by remember { mutableStateOf<String?>(null) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Edit Student") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                OutlinedTextField(
+                    value = student.rrn,
+                    onValueChange = {},
+                    label = { Text("RRN") },
+                    enabled = false,
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Name") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = phone,
+                    onValueChange = { phone = it },
+                    label = { Text("Phone") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = notes,
+                    onValueChange = { notes = it },
+                    label = { Text("Notes") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                errorText?.let {
+                    Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    if (name.trim().isEmpty()) {
+                        errorText = "Name is required."
+                        return@TextButton
+                    }
+                    onSave(
+                        student.copy(
+                            name = name.trim(),
+                            phone = phone.trim().ifEmpty { null },
+                            notes = notes.trim().ifEmpty { null }
+                        )
+                    )
+                }
+            ) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Cancel") }
+        }
+    )
 }

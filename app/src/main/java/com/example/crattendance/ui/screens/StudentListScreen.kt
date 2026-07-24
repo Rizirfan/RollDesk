@@ -2,17 +2,55 @@ package com.example.crattendance.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -35,6 +73,7 @@ fun StudentListScreen(
     var searchQuery by remember { mutableStateOf("") }
     var debouncedQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
+    var showAddStudentDialog by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
@@ -47,7 +86,7 @@ fun StudentListScreen(
         if (debouncedQuery.isEmpty()) students
         else students.filter {
             it.name.contains(debouncedQuery, ignoreCase = true) ||
-            it.rrn.contains(debouncedQuery, ignoreCase = true)
+                it.rrn.contains(debouncedQuery, ignoreCase = true)
         }
     }
 
@@ -100,6 +139,13 @@ fun StudentListScreen(
                         tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
+                IconButton(onClick = { showAddStudentDialog = true }) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add Students",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
         }
 
@@ -132,7 +178,7 @@ fun StudentListScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = if (searchQuery.isEmpty()) "No students yet. Import students in Setup." else "No matching students",
+                    text = if (searchQuery.isEmpty()) "No students yet. Use + to add single or bulk students." else "No matching students",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -168,4 +214,254 @@ fun StudentListScreen(
             }
         }
     }
+
+    if (showAddStudentDialog) {
+        AddStudentsDialog(
+            onDismiss = { showAddStudentDialog = false },
+            onAddSingle = { rrn, name, phone, notes ->
+                viewModel.addManualStudent(rrn = rrn, name = name, phone = phone, notes = notes)
+            },
+            onAddBulk = { csvData ->
+                viewModel.addBulkStudents(csvData)
+            }
+        )
+    }
+}
+
+@Composable
+private fun AddStudentsDialog(
+    onDismiss: () -> Unit,
+    onAddSingle: (rrn: String, name: String, phone: String, notes: String) -> Unit,
+    onAddBulk: (csvData: String) -> Unit
+) {
+    var selectedMode by remember { mutableStateOf(0) } // 0 = single, 1 = bulk
+    var rrn by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
+    var notes by remember { mutableStateOf("") }
+    var bulkText by remember { mutableStateOf("") }
+    var errorText by remember { mutableStateOf<String?>(null) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(16.dp),
+        title = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.PersonAdd,
+                    contentDescription = null,
+                    tint = com.example.crattendance.theme.Teal,
+                    modifier = Modifier.size(24.dp)
+                )
+                Text(
+                    text = "Add Students",
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f), RoundedCornerShape(8.dp))
+                        .padding(4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    val activeColor = com.example.crattendance.theme.Teal
+                    val inactiveTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    val activeTextColor = Color.White
+                    
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(if (selectedMode == 0) activeColor else Color.Transparent)
+                            .clickable { selectedMode = 0 }
+                            .padding(vertical = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            "Single Student",
+                            color = if (selectedMode == 0) activeTextColor else inactiveTextColor,
+                            fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                    
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(if (selectedMode == 1) activeColor else Color.Transparent)
+                            .clickable { selectedMode = 1 }
+                            .padding(vertical = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            "Bulk Import",
+                            color = if (selectedMode == 1) activeTextColor else inactiveTextColor,
+                            fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                }
+
+                if (selectedMode == 0) {
+                    OutlinedTextField(
+                        value = rrn,
+                        onValueChange = { 
+                            rrn = it
+                            errorText = null
+                        },
+                        label = { Text("RRN") },
+                        leadingIcon = { Icon(Icons.Default.Info, contentDescription = null, tint = com.example.crattendance.theme.Teal.copy(alpha = 0.7f), modifier = Modifier.size(18.dp)) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = com.example.crattendance.theme.Teal,
+                            focusedLabelColor = com.example.crattendance.theme.Teal,
+                            cursorColor = com.example.crattendance.theme.Teal
+                        )
+                    )
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = { 
+                            name = it
+                            errorText = null
+                        },
+                        label = { Text("Name") },
+                        leadingIcon = { Icon(Icons.Default.Person, contentDescription = null, tint = com.example.crattendance.theme.Teal.copy(alpha = 0.7f), modifier = Modifier.size(18.dp)) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = com.example.crattendance.theme.Teal,
+                            focusedLabelColor = com.example.crattendance.theme.Teal,
+                            cursorColor = com.example.crattendance.theme.Teal
+                        )
+                    )
+                    OutlinedTextField(
+                        value = phone,
+                        onValueChange = { phone = it },
+                        label = { Text("Phone (optional)") },
+                        leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null, tint = com.example.crattendance.theme.Teal.copy(alpha = 0.7f), modifier = Modifier.size(18.dp)) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = com.example.crattendance.theme.Teal,
+                            focusedLabelColor = com.example.crattendance.theme.Teal,
+                            cursorColor = com.example.crattendance.theme.Teal
+                        )
+                    )
+                    OutlinedTextField(
+                        value = notes,
+                        onValueChange = { notes = it },
+                        label = { Text("Notes (optional)") },
+                        leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null, tint = com.example.crattendance.theme.Teal.copy(alpha = 0.7f), modifier = Modifier.size(18.dp)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = com.example.crattendance.theme.Teal,
+                            focusedLabelColor = com.example.crattendance.theme.Teal,
+                            cursorColor = com.example.crattendance.theme.Teal
+                        )
+                    )
+                } else {
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text(
+                            "Paste CSV format lines below:",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Text(
+                            "Format: RRN,Name,Phone,Notes (one per line)",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                        )
+                    }
+                    OutlinedTextField(
+                        value = bulkText,
+                        onValueChange = { 
+                            bulkText = it
+                            errorText = null
+                        },
+                        placeholder = { Text("22CS001,Arya,9876543210,Class rep") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(150.dp),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = com.example.crattendance.theme.Teal,
+                            cursorColor = com.example.crattendance.theme.Teal
+                        )
+                    )
+                }
+
+                errorText?.let {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        modifier = Modifier.padding(top = 4.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Warning,
+                            contentDescription = "Error",
+                            tint = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    if (selectedMode == 0) {
+                        if (rrn.trim().isEmpty() || name.trim().isEmpty()) {
+                            errorText = "RRN and Name are required."
+                            return@Button
+                        }
+                        onAddSingle(rrn, name, phone, notes)
+                    } else {
+                        if (bulkText.trim().isEmpty()) {
+                            errorText = "Paste at least one student line."
+                            return@Button
+                        }
+                        onAddBulk(bulkText)
+                    }
+                    onDismiss()
+                },
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = com.example.crattendance.theme.Teal
+                )
+            ) {
+                Text(if (selectedMode == 0) "Add Student" else "Import Bulk", fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = {
+            OutlinedButton(
+                onClick = onDismiss,
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            ) { 
+                Text("Cancel") 
+            }
+        }
+    )
 }
