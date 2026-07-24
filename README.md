@@ -6,7 +6,7 @@
 
 A modern Android attendance management app built for Class Representatives to take, track, and manage classroom attendance with ease.
 
-[![Release](https://img.shields.io/github/v/release/Rizirfan/RollDesk?style=for-the-badge&color=0D7377)](https://github.com/Rizirfan/RollDesk/releases/latest)
+[![Release](https://img.shields.io/github/v/release/Rizirfan/RollDesk?style=for-the-badge&color=0D7377)](https://github.com/Rizirfan/RollDesk/releases/download/v1.4.0/app-debug-v1.4.0.apk)
 [![License](https://img.shields.io/github/license/Rizirfan/RollDesk?style=for-the-badge&color=0D7377)](LICENSE)
 [![Android](https://img.shields.io/badge/Android-8.0%2B-3DDC84?style=for-the-badge&logo=android)](https://developer.android.com/about/versions/oreo)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.3.20-7F52FF?style=for-the-badge&logo=kotlin)](https://kotlinlang.org)
