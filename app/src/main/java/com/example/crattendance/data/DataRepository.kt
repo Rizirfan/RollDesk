@@ -94,6 +94,10 @@ class DataRepository @Inject constructor(
     suspend fun deletePeriodAttendance(date: String, period: Int) = withContext(Dispatchers.IO) {
         attendanceDao.deletePeriodAttendance(date, period)
     }
+    suspend fun replaceAttendanceForPeriod(date: String, period: Int, records: List<AttendanceRecordEntity>) = withContext(Dispatchers.IO) {
+        attendanceDao.deletePeriodAttendance(date, period)
+        attendanceDao.insertAll(records)
+    }
     suspend fun deleteAllAttendance() = withContext(Dispatchers.IO) {
         attendanceDao.deleteAll()
     }
@@ -140,6 +144,10 @@ class DataRepository @Inject constructor(
     }
     suspend fun deleteElectiveAttendanceForDateAndElective(date: String, electiveName: String) = withContext(Dispatchers.IO) {
         electiveAttendanceDao.deleteRecordsForDateAndElective(date, electiveName)
+    }
+    suspend fun replaceElectiveAttendance(date: String, electiveName: String, subject: String, records: List<ElectiveAttendanceRecordEntity>) = withContext(Dispatchers.IO) {
+        electiveAttendanceDao.deleteRecordsForDateAndElectiveAndSubject(date, electiveName, subject)
+        electiveAttendanceDao.insertAll(records)
     }
     suspend fun deleteAllElectiveAttendance() = withContext(Dispatchers.IO) {
         electiveAttendanceDao.deleteAll()

@@ -51,6 +51,7 @@ fun TakeAttendanceScreen(
     electiveName: String? = null,
     editDate: String? = null,
     editPeriod: Int? = null,
+    editSubject: String? = null,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -60,8 +61,9 @@ fun TakeAttendanceScreen(
     val timetable by viewModel.timetable.collectAsState()
     val periodsPerDay by viewModel.periodsPerDay.collectAsState()
     val allAttendanceRecords by viewModel.attendanceRecords.collectAsState()
+    val electiveAttendanceRecords by viewModel.electiveAttendanceRecords.collectAsState()
 
-    val isEditMode = editDate != null && editPeriod != null
+    val isEditMode = editDate != null && (editPeriod != null || (isElective && editSubject != null))
 
     val students = remember(allStudents, electiveStudents, isElective, electiveName) {
         if (isElective && !electiveName.isNullOrEmpty()) {
@@ -118,35 +120,57 @@ fun TakeAttendanceScreen(
 
     var selectedPeriodIndex by remember { mutableIntStateOf(0) }
     var selectedPeriodNum by remember { mutableIntStateOf(editPeriod ?: 1) }
-    var selectedSubjectName by remember { mutableStateOf(if (isElective) "Linux" else "Period") }
+    var selectedSubjectName by remember { mutableStateOf(editSubject ?: if (isElective) "Elective" else "Period") }
 
     val attendanceMap = remember { mutableStateMapOf<String, AttendanceStatus>() }
 
-    LaunchedEffect(students, isEditMode, editDate, editPeriod) {
-        if (isEditMode && editDate != null && editPeriod != null) {
-            val existingRecords = allAttendanceRecords.filter {
-                it.date == editDate && it.period == editPeriod
-            }
-            students.forEach { s ->
-                val record = existingRecords.find { it.studentRrn == s.rrn }
-                if (record != null) {
-                    attendanceMap[s.rrn] = when (record.status) {
-                        "Present" -> AttendanceStatus.PRESENT
-                        "Absent" -> AttendanceStatus.ABSENT
-                        "Medical Leave" -> AttendanceStatus.MEDICAL_LEAVE
-                        "On Duty" -> AttendanceStatus.ON_DUTY
-                        "Late" -> AttendanceStatus.LATE
-                        else -> AttendanceStatus.PRESENT
-                    }
-                } else {
-                    attendanceMap[s.rrn] = AttendanceStatus.PRESENT
+    LaunchedEffect(students, isEditMode, editDate, editPeriod, editSubject, isElective, electiveName, allAttendanceRecords, electiveAttendanceRecords) {
+        if (isEditMode && editDate != null) {
+            if (isElective && !electiveName.isNullOrEmpty() && editSubject != null) {
+                val existingRecords = electiveAttendanceRecords.filter {
+                    it.date == editDate && it.electiveName == electiveName && it.subject == editSubject
                 }
-            }
-            if (existingRecords.isNotEmpty()) {
-                selectedSubjectName = existingRecords.first().subject
-                selectedPeriodNum = editPeriod
-                val idx = todayPeriods.indexOfFirst { it.period == editPeriod }
-                if (idx >= 0) selectedPeriodIndex = idx
+                students.forEach { s ->
+                    val record = existingRecords.find { it.studentRrn == s.rrn }
+                    if (record != null) {
+                        attendanceMap[s.rrn] = when (record.status) {
+                            "Present" -> AttendanceStatus.PRESENT
+                            "Absent" -> AttendanceStatus.ABSENT
+                            "Medical Leave" -> AttendanceStatus.MEDICAL_LEAVE
+                            "On Duty" -> AttendanceStatus.ON_DUTY
+                            "Late" -> AttendanceStatus.LATE
+                            else -> AttendanceStatus.PRESENT
+                        }
+                    } else {
+                        attendanceMap[s.rrn] = AttendanceStatus.PRESENT
+                    }
+                }
+                selectedSubjectName = editSubject
+            } else if (editPeriod != null) {
+                val existingRecords = allAttendanceRecords.filter {
+                    it.date == editDate && it.period == editPeriod
+                }
+                students.forEach { s ->
+                    val record = existingRecords.find { it.studentRrn == s.rrn }
+                    if (record != null) {
+                        attendanceMap[s.rrn] = when (record.status) {
+                            "Present" -> AttendanceStatus.PRESENT
+                            "Absent" -> AttendanceStatus.ABSENT
+                            "Medical Leave" -> AttendanceStatus.MEDICAL_LEAVE
+                            "On Duty" -> AttendanceStatus.ON_DUTY
+                            "Late" -> AttendanceStatus.LATE
+                            else -> AttendanceStatus.PRESENT
+                        }
+                    } else {
+                        attendanceMap[s.rrn] = AttendanceStatus.PRESENT
+                    }
+                }
+                if (existingRecords.isNotEmpty()) {
+                    selectedSubjectName = existingRecords.first().subject
+                    selectedPeriodNum = editPeriod
+                    val idx = todayPeriods.indexOfFirst { it.period == editPeriod }
+                    if (idx >= 0) selectedPeriodIndex = idx
+                }
             }
         } else {
             students.forEach { s ->
@@ -354,10 +378,15 @@ fun TakeAttendanceScreen(
                                 timestamp = timestamp
                             )
                         }
-                        if (isEditMode) {
-                            viewModel.deleteElectiveAttendanceForDateAndElective(selectedDateStr, electiveName)
+                        val saveJob = viewModel.replaceElectiveAttendance(selectedDateStr, electiveName, selectedSubjectName, recordList)
+                        viewModel.viewModelScope.launch {
+                            saveJob.join()
+                            com.example.crattendance.widget.QuickRollWidget.updateAllWidgets(context)
+                            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                Toast.makeText(context, if (isEditMode) "Attendance updated" else "Attendance saved", Toast.LENGTH_SHORT).show()
+                                onBack()
+                            }
                         }
-                        viewModel.saveElectiveAttendance(recordList)
                     } else {
                         val recordList = students.map { s ->
                             AttendanceRecordEntity(
@@ -369,13 +398,16 @@ fun TakeAttendanceScreen(
                                 timestamp = timestamp
                             )
                         }
-                        if (isEditMode) {
-                            viewModel.deletePeriodAttendance(selectedDateStr, selectedPeriodNum)
+                        val saveJob = viewModel.replaceAttendanceForPeriod(selectedDateStr, selectedPeriodNum, recordList)
+                        viewModel.viewModelScope.launch {
+                            saveJob.join()
+                            com.example.crattendance.widget.QuickRollWidget.updateAllWidgets(context)
+                            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                Toast.makeText(context, if (isEditMode) "Attendance updated" else "Attendance saved", Toast.LENGTH_SHORT).show()
+                                onBack()
+                            }
                         }
-                        viewModel.saveAttendance(recordList)
                     }
-                    Toast.makeText(context, if (isEditMode) "Attendance updated" else "Attendance saved", Toast.LENGTH_SHORT).show()
-                    onBack()
                 },
                 onShareText = {
                     val sb = StringBuilder()

@@ -13,3 +13,4 @@ import kotlinx.serialization.Serializable
 @Serializable data object TimetableScreen : NavKey
 @Serializable data object SettingsScreen : NavKey
 @Serializable data class EditAttendance(val date: String, val period: Int) : NavKey
+@Serializable data class EditElectiveAttendance(val date: String, val electiveName: String, val subject: String) : NavKey

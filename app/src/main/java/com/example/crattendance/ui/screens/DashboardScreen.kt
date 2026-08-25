@@ -54,6 +54,7 @@ fun DashboardScreen(
     onNavigateToTimetable: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onEditSession: (date: String, period: Int) -> Unit,
+    onEditElectiveSession: (date: String, electiveName: String, subject: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val students by viewModel.students.collectAsState()
@@ -728,9 +729,23 @@ fun DashboardScreen(
                                 Text("PDF", style = MaterialTheme.typography.labelSmall)
                             }
 
+                            OutlinedButton(
+                                onClick = {
+                                    onEditElectiveSession(first.date, first.electiveName, first.subject)
+                                    selectedElectiveSession = null
+                                },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(8.dp),
+                                contentPadding = PaddingValues(vertical = 6.dp)
+                            ) {
+                                Icon(imageVector = Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(14.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Edit", style = MaterialTheme.typography.labelSmall)
+                            }
+
                             Button(
                                 onClick = { selectedElectiveSession = null },
-                                modifier = Modifier.weight(1.2f),
+                                modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(8.dp),
                                 contentPadding = PaddingValues(vertical = 6.dp)
                             ) { Text("Close", style = MaterialTheme.typography.labelSmall) }
@@ -752,6 +767,10 @@ fun DashboardScreen(
                 Button(
                     onClick = {
                         viewModel.deleteElectiveAttendanceForDateAndElective(first.date, first.electiveName)
+                        viewModel.viewModelScope.launch {
+                            kotlinx.coroutines.delay(300)
+                            com.example.crattendance.widget.QuickRollWidget.updateAllWidgets(context)
+                        }
                         showElectiveDeleteDialog = false
                         selectedElectiveSession = null
                         electiveSessionToDelete = null
@@ -1002,6 +1021,10 @@ fun DashboardScreen(
                 Button(
                     onClick = {
                         viewModel.deletePeriodAttendance(first.date, first.period)
+                        viewModel.viewModelScope.launch {
+                            kotlinx.coroutines.delay(300)
+                            com.example.crattendance.widget.QuickRollWidget.updateAllWidgets(context)
+                        }
                         showDeleteDialog = false
                         sessionToDelete = null
                         Toast.makeText(context, "Record deleted", Toast.LENGTH_SHORT).show()

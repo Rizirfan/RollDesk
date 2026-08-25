@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -170,8 +171,8 @@ class CRAttendanceViewModel @Inject constructor(
         }
     }
 
-    fun saveAttendance(records: List<com.example.crattendance.data.database.AttendanceRecordEntity>) {
-        viewModelScope.launch {
+    fun saveAttendance(records: List<com.example.crattendance.data.database.AttendanceRecordEntity>): Job {
+        return viewModelScope.launch {
             repository.saveAttendanceRecords(records)
         }
     }
@@ -179,6 +180,12 @@ class CRAttendanceViewModel @Inject constructor(
     fun deletePeriodAttendance(date: String, period: Int) {
         viewModelScope.launch {
             repository.deletePeriodAttendance(date, period)
+        }
+    }
+
+    fun replaceAttendanceForPeriod(date: String, period: Int, records: List<com.example.crattendance.data.database.AttendanceRecordEntity>): Job {
+        return viewModelScope.launch {
+            repository.replaceAttendanceForPeriod(date, period, records)
         }
     }
 
@@ -224,8 +231,8 @@ class CRAttendanceViewModel @Inject constructor(
         }
     }
 
-    fun saveElectiveAttendance(records: List<ElectiveAttendanceRecordEntity>) {
-        viewModelScope.launch {
+    fun saveElectiveAttendance(records: List<ElectiveAttendanceRecordEntity>): Job {
+        return viewModelScope.launch {
             repository.saveElectiveAttendanceRecords(records)
         }
     }
@@ -233,6 +240,12 @@ class CRAttendanceViewModel @Inject constructor(
     fun deleteElectiveAttendanceForDateAndElective(date: String, electiveName: String) {
         viewModelScope.launch {
             repository.deleteElectiveAttendanceForDateAndElective(date, electiveName)
+        }
+    }
+
+    fun replaceElectiveAttendance(date: String, electiveName: String, subject: String, records: List<ElectiveAttendanceRecordEntity>): Job {
+        return viewModelScope.launch {
+            repository.replaceElectiveAttendance(date, electiveName, subject, records)
         }
     }
 

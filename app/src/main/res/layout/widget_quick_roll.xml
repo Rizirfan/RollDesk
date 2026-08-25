@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_background"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/widget_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="RollDesk"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#0F172A"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/widget_day"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mon, 25 Aug"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="#00796B"
+            android:background="@drawable/widget_period_badge"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="3dp"
+            android:maxLines="1"
+            android:ellipsize="end" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#F1F5F9"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="4dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:paddingVertical="2dp">
+
+        <TextView
+            android:id="@+id/widget_period_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="6 periods scheduled today"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="#334155"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/widget_attendance_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3 / 6 periods completed"
+            android:textSize="11sp"
+            android:textColor="#059669"
+            android:layout_marginTop="3dp"
+            android:background="@drawable/widget_status_bg"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/widget_btn_take_roll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="36dp"
+        android:text="Take Roll Call"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/widget_button_bg"
+        android:gravity="center"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="6dp" />
+
+</LinearLayout>

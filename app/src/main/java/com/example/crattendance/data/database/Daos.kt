@@ -161,6 +161,9 @@ interface ElectiveAttendanceDao {
     @Query("UPDATE elective_attendance_records SET electiveName = :newName WHERE electiveName = :oldName")
     fun renameElective(oldName: String, newName: String)
 
+    @Query("DELETE FROM elective_attendance_records WHERE date = :date AND electiveName = :electiveName AND subject = :subject")
+    fun deleteRecordsForDateAndElectiveAndSubject(date: String, electiveName: String, subject: String)
+
     @Query("DELETE FROM elective_attendance_records WHERE date = :date AND electiveName = :electiveName")
     fun deleteRecordsForDateAndElective(date: String, electiveName: String)
 

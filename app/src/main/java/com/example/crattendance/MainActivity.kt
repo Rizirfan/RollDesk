@@ -1,5 +1,6 @@
 package com.example.crattendance
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -13,7 +14,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.crattendance.theme.CRAttendanceTheme
@@ -23,36 +26,49 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
 
-    enableEdgeToEdge(
-      statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
-    )
+    private val navigationRouteState = mutableStateOf<String?>(null)
 
-    setContent {
-      val viewModel: CRAttendanceViewModel = hiltViewModel()
-      val themeMode by viewModel.themeMode.collectAsState()
-      val isSetupCompletedState by viewModel.isSetupCompleted.collectAsState()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-      CRAttendanceTheme(themeMode = themeMode) {
-        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-          // If setup state is not yet loaded from datastore flow (first emission is loading), render spinner
-          if (isSetupCompletedState == null) {
-            Box(
-              modifier = Modifier.fillMaxSize(),
-              contentAlignment = androidx.compose.ui.Alignment.Center
-            ) {
-              CircularProgressIndicator(
-                color = MaterialTheme.colorScheme.primary,
-                strokeWidth = 3.dp
-              )
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+        )
+
+        navigationRouteState.value = intent?.getStringExtra("navigate_to")
+
+        setContent {
+            val viewModel: CRAttendanceViewModel = hiltViewModel()
+            val themeMode by viewModel.themeMode.collectAsState()
+            val isSetupCompletedState by viewModel.isSetupCompleted.collectAsState()
+
+            CRAttendanceTheme(themeMode = themeMode) {
+                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                    if (isSetupCompletedState == null) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = androidx.compose.ui.Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                color = MaterialTheme.colorScheme.primary,
+                                strokeWidth = 3.dp
+                            )
+                        }
+                    } else {
+                        MainNavigation(
+                            isSetupCompleted = isSetupCompletedState ?: false,
+                            initialRoute = navigationRouteState.value
+                        )
+                    }
+                }
             }
-          } else {
-            MainNavigation(isSetupCompleted = isSetupCompletedState ?: false)
-          }
         }
-      }
     }
-  }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        navigationRouteState.value = intent.getStringExtra("navigate_to")
+    }
 }

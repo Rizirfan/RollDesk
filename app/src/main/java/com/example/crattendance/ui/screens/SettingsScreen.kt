@@ -20,6 +20,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
+import android.os.Build
+import com.example.crattendance.widget.QuickRollWidget
 import com.example.crattendance.data.database.CollegeConfigEntity
 import com.example.crattendance.ui.main.CRAttendanceViewModel
 import kotlinx.coroutines.launch
@@ -187,6 +191,63 @@ fun SettingsScreen(
                 Icon(imageVector = Icons.Default.Save, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(6.dp))
                 Text("Save Profile", fontWeight = FontWeight.SemiBold)
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text("App Widgets", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.surfaceContainerLow,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(
+                        "Add a shortcut to your home screen for fast roll calls.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedButton(
+                            onClick = {
+                                QuickRollWidget.updateAllWidgets(context)
+                                Toast.makeText(context, "Widget refreshed", Toast.LENGTH_SHORT).show()
+                            },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(8.dp),
+                            contentPadding = PaddingValues(vertical = 8.dp)
+                        ) {
+                            Text("Refresh Widget", style = MaterialTheme.typography.labelSmall)
+                        }
+
+                        Button(
+                            onClick = {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                    val appWidgetManager = AppWidgetManager.getInstance(context)
+                                    val provider = ComponentName(context, QuickRollWidget::class.java)
+                                    if (appWidgetManager.isRequestPinAppWidgetSupported) {
+                                        appWidgetManager.requestPinAppWidget(provider, null, null)
+                                    } else {
+                                        Toast.makeText(context, "Pinning widgets is not supported by your launcher.", Toast.LENGTH_SHORT).show()
+                                    }
+                                } else {
+                                    Toast.makeText(context, "Add widget from your device home screen menu.", Toast.LENGTH_SHORT).show()
+                                }
+                            },
+                            modifier = Modifier.weight(1.2f),
+                            shape = RoundedCornerShape(8.dp),
+                            contentPadding = PaddingValues(vertical = 8.dp)
+                        ) {
+                            Text("+ Add Widget", style = MaterialTheme.typography.labelSmall)
+                        }
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(20.dp))

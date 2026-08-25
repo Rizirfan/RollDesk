@@ -32,7 +32,7 @@ import com.example.crattendance.ui.main.CRAttendanceViewModel
 import com.example.crattendance.ui.screens.*
 
 @Composable
-fun MainNavigation(isSetupCompleted: Boolean) {
+fun MainNavigation(isSetupCompleted: Boolean, initialRoute: String? = null) {
     val viewModel: CRAttendanceViewModel = hiltViewModel()
     val activity = LocalContext.current as? Activity
 
@@ -41,10 +41,14 @@ fun MainNavigation(isSetupCompleted: Boolean) {
     }
     val backStack = rememberNavBackStack(startDestination)
 
-    LaunchedEffect(isSetupCompleted) {
+    LaunchedEffect(isSetupCompleted, initialRoute) {
         backStack.clear()
         if (isSetupCompleted) {
             backStack.add(Dashboard)
+            when (initialRoute) {
+                "take_attendance" -> backStack.add(TakeAttendance)
+                "timetable" -> backStack.add(TimetableScreen)
+            }
         } else {
             backStack.add(SetupWizard)
         }
@@ -123,6 +127,7 @@ fun MainNavigation(isSetupCompleted: Boolean) {
                             onNavigateToTimetable = { backStack.add(TimetableScreen) },
                             onNavigateToSettings = { backStack.add(SettingsScreen) },
                             onEditSession = { date, period -> backStack.add(EditAttendance(date, period)) },
+                            onEditElectiveSession = { date, electiveName, subject -> backStack.add(EditElectiveAttendance(date, electiveName, subject)) },
                             modifier = Modifier.padding(padding)
                         )
                     }
@@ -214,6 +219,17 @@ fun MainNavigation(isSetupCompleted: Boolean) {
                         viewModel = viewModel,
                         editDate = key.date,
                         editPeriod = key.period,
+                        onBack = { popBackStack() },
+                        modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
+                    )
+                }
+                entry<EditElectiveAttendance> { key ->
+                    TakeAttendanceScreen(
+                        viewModel = viewModel,
+                        isElective = true,
+                        electiveName = key.electiveName,
+                        editDate = key.date,
+                        editSubject = key.subject,
                         onBack = { popBackStack() },
                         modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
                     )
