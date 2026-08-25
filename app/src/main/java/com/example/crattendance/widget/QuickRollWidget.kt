@@ -26,15 +26,16 @@ class QuickRollWidget : AppWidgetProvider() {
                 for (appWidgetId in appWidgetIds) {
                     updateQuickRollWidget(context, appWidgetManager, appWidgetId)
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
             } finally {
-                pendingResult.finish()
+                try {
+                    pendingResult?.finish()
+                } catch (e: Exception) {
+                    // Ignore finish exception if already finished
+                }
             }
         }
-    }
-
-    override fun onEnabled(context: Context) {
-        super.onEnabled(context)
-        triggerUpdate(context)
     }
 
     companion object {
@@ -62,7 +63,6 @@ class QuickRollWidget : AppWidgetProvider() {
             try {
                 val db = AppDatabase.getDatabase(context.applicationContext)
                 val dayOfWeek = getDayOfWeek()
-                val dayName = getDayName(dayOfWeek)
 
                 val periods = db.timetableDao().getTimetableForDayDirect(dayOfWeek)
                 val allRecords = db.attendanceDao().getAllRecordsDirect()
@@ -74,21 +74,52 @@ class QuickRollWidget : AppWidgetProvider() {
                 val todayRecords = allRecords.filter { it.date == todayIso }
 
                 views.setTextViewText(R.id.widget_day, todayFormatted)
-                views.setTextViewText(
-                    R.id.widget_period_count,
-                    if (periods.isEmpty()) "No periods scheduled"
-                    else "${periods.size} periods scheduled today"
+
+                val completedPeriodNumbers = todayRecords.map { it.period }.distinct()
+                val completedCount = completedPeriodNumbers.size
+
+                val slotRows = arrayOf(
+                    R.id.period1_row, R.id.period2_row, R.id.period3_row,
+                    R.id.period4_row, R.id.period5_row, R.id.period6_row,
+                    R.id.period7_row, R.id.period8_row
+                )
+                val slotTags = arrayOf(
+                    R.id.period1_tag, R.id.period2_tag, R.id.period3_tag,
+                    R.id.period4_tag, R.id.period5_tag, R.id.period6_tag,
+                    R.id.period7_tag, R.id.period8_tag
+                )
+                val slotNames = arrayOf(
+                    R.id.period1_name, R.id.period2_name, R.id.period3_name,
+                    R.id.period4_name, R.id.period5_name, R.id.period6_name,
+                    R.id.period7_name, R.id.period8_name
                 )
 
-                if (periods.isNotEmpty() && todayRecords.isNotEmpty()) {
-                    val completedPeriods = todayRecords.map { it.period }.distinct().size
+                val sortedPeriods = periods.sortedBy { it.period }
+
+                if (sortedPeriods.isEmpty()) {
+                    views.setViewVisibility(R.id.widget_no_periods, android.view.View.VISIBLE)
+                    for (rowId in slotRows) {
+                        views.setViewVisibility(rowId, android.view.View.GONE)
+                    }
+                    views.setViewVisibility(R.id.widget_attendance_status, android.view.View.GONE)
+                } else {
+                    views.setViewVisibility(R.id.widget_no_periods, android.view.View.GONE)
+                    views.setViewVisibility(R.id.widget_attendance_status, android.view.View.VISIBLE)
                     views.setTextViewText(
                         R.id.widget_attendance_status,
-                        "$completedPeriods / ${periods.size} periods completed"
+                        "$completedCount/${sortedPeriods.size} Completed"
                     )
-                    views.setViewVisibility(R.id.widget_attendance_status, android.view.View.VISIBLE)
-                } else {
-                    views.setViewVisibility(R.id.widget_attendance_status, android.view.View.GONE)
+
+                    for (i in slotRows.indices) {
+                        if (i < sortedPeriods.size) {
+                            val period = sortedPeriods[i]
+                            views.setViewVisibility(slotRows[i], android.view.View.VISIBLE)
+                            views.setTextViewText(slotTags[i], "P${period.period}")
+                            views.setTextViewText(slotNames[i], period.subjectName)
+                        } else {
+                            views.setViewVisibility(slotRows[i], android.view.View.GONE)
+                        }
+                    }
                 }
 
                 val openIntent = Intent(context, MainActivity::class.java).apply {
@@ -106,7 +137,8 @@ class QuickRollWidget : AppWidgetProvider() {
 
             } catch (e: Exception) {
                 views.setTextViewText(R.id.widget_day, "RollDesk")
-                views.setTextViewText(R.id.widget_period_count, "Tap to open")
+                views.setViewVisibility(R.id.widget_no_periods, android.view.View.VISIBLE)
+                views.setViewVisibility(R.id.widget_attendance_status, android.view.View.GONE)
             }
 
             appWidgetManager.updateAppWidget(appWidgetId, views)

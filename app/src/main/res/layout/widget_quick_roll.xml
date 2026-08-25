@@ -1,11 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@drawable/widget_background"
-    android:padding="12dp">
+    android:paddingLeft="12dp"
+    android:paddingTop="12dp"
+    android:paddingRight="12dp"
+    android:paddingBottom="12dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,79 +24,369 @@
             android:text="RollDesk"
             android:textSize="15sp"
             android:textStyle="bold"
-            android:textColor="#0F172A"
-            android:maxLines="1"
-            android:ellipsize="end" />
+            android:textColor="#0D7377" />
 
         <TextView
             android:id="@+id/widget_day"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Mon, 25 Aug"
+            android:text="Tue, 25 Aug"
             android:textSize="11sp"
             android:textStyle="bold"
-            android:textColor="#00796B"
+            android:textColor="#0D7377"
             android:background="@drawable/widget_period_badge"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="3dp"
-            android:maxLines="1"
-            android:ellipsize="end" />
+            android:paddingLeft="8dp"
+            android:paddingTop="3dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="3dp" />
     </LinearLayout>
 
-    <View
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#F1F5F9"
         android:layout_marginTop="6dp"
-        android:layout_marginBottom="4dp" />
+        android:layout_marginBottom="6dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingVertical="2dp">
+        android:layout_marginBottom="4dp">
 
         <TextView
-            android:id="@+id/widget_period_count"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="6 periods scheduled today"
-            android:textSize="12sp"
+            android:layout_weight="1"
+            android:text="TODAY&#39;S SCHEDULE"
+            android:textSize="9sp"
             android:textStyle="bold"
-            android:textColor="#334155"
-            android:maxLines="1"
-            android:ellipsize="end" />
+            android:textColor="#94A3B8" />
 
         <TextView
             android:id="@+id/widget_attendance_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="3 / 6 periods completed"
-            android:textSize="11sp"
-            android:textColor="#059669"
-            android:layout_marginTop="3dp"
+            android:text="2/6 Completed"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:textColor="#2E7D32"
             android:background="@drawable/widget_status_bg"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="2dp"
-            android:maxLines="1"
-            android:ellipsize="end"
+            android:paddingLeft="6dp"
+            android:paddingTop="1dp"
+            android:paddingRight="6dp"
+            android:paddingBottom="1dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/period1_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingTop="2.5dp"
+            android:paddingBottom="2.5dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/period1_tag"
+                android:layout_width="24dp"
+                android:layout_height="wrap_content"
+                android:text="P1"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="#0D7377"
+                android:gravity="center"
+                android:background="@drawable/widget_period_badge"
+                android:paddingTop="1dp"
+                android:paddingBottom="1dp" />
+
+            <TextView
+                android:id="@+id/period1_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Subject 1"
+                android:textSize="11sp"
+                android:textColor="#0F172A"
+                android:maxLines="1"
+                android:ellipsize="end" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/period2_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingTop="2.5dp"
+            android:paddingBottom="2.5dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/period2_tag"
+                android:layout_width="24dp"
+                android:layout_height="wrap_content"
+                android:text="P2"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="#0D7377"
+                android:gravity="center"
+                android:background="@drawable/widget_period_badge"
+                android:paddingTop="1dp"
+                android:paddingBottom="1dp" />
+
+            <TextView
+                android:id="@+id/period2_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Subject 2"
+                android:textSize="11sp"
+                android:textColor="#0F172A"
+                android:maxLines="1"
+                android:ellipsize="end" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/period3_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingTop="2.5dp"
+            android:paddingBottom="2.5dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/period3_tag"
+                android:layout_width="24dp"
+                android:layout_height="wrap_content"
+                android:text="P3"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="#0D7377"
+                android:gravity="center"
+                android:background="@drawable/widget_period_badge"
+                android:paddingTop="1dp"
+                android:paddingBottom="1dp" />
+
+            <TextView
+                android:id="@+id/period3_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Subject 3"
+                android:textSize="11sp"
+                android:textColor="#0F172A"
+                android:maxLines="1"
+                android:ellipsize="end" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/period4_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingTop="2.5dp"
+            android:paddingBottom="2.5dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/period4_tag"
+                android:layout_width="24dp"
+                android:layout_height="wrap_content"
+                android:text="P4"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="#0D7377"
+                android:gravity="center"
+                android:background="@drawable/widget_period_badge"
+                android:paddingTop="1dp"
+                android:paddingBottom="1dp" />
+
+            <TextView
+                android:id="@+id/period4_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Subject 4"
+                android:textSize="11sp"
+                android:textColor="#0F172A"
+                android:maxLines="1"
+                android:ellipsize="end" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/period5_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingTop="2.5dp"
+            android:paddingBottom="2.5dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/period5_tag"
+                android:layout_width="24dp"
+                android:layout_height="wrap_content"
+                android:text="P5"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="#0D7377"
+                android:gravity="center"
+                android:background="@drawable/widget_period_badge"
+                android:paddingTop="1dp"
+                android:paddingBottom="1dp" />
+
+            <TextView
+                android:id="@+id/period5_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Subject 5"
+                android:textSize="11sp"
+                android:textColor="#0F172A"
+                android:maxLines="1"
+                android:ellipsize="end" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/period6_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingTop="2.5dp"
+            android:paddingBottom="2.5dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/period6_tag"
+                android:layout_width="24dp"
+                android:layout_height="wrap_content"
+                android:text="P6"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="#0D7377"
+                android:gravity="center"
+                android:background="@drawable/widget_period_badge"
+                android:paddingTop="1dp"
+                android:paddingBottom="1dp" />
+
+            <TextView
+                android:id="@+id/period6_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Subject 6"
+                android:textSize="11sp"
+                android:textColor="#0F172A"
+                android:maxLines="1"
+                android:ellipsize="end" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/period7_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingTop="2.5dp"
+            android:paddingBottom="2.5dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/period7_tag"
+                android:layout_width="24dp"
+                android:layout_height="wrap_content"
+                android:text="P7"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="#0D7377"
+                android:gravity="center"
+                android:background="@drawable/widget_period_badge"
+                android:paddingTop="1dp"
+                android:paddingBottom="1dp" />
+
+            <TextView
+                android:id="@+id/period7_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Subject 7"
+                android:textSize="11sp"
+                android:textColor="#0F172A"
+                android:maxLines="1"
+                android:ellipsize="end" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/period8_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingTop="2.5dp"
+            android:paddingBottom="2.5dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/period8_tag"
+                android:layout_width="24dp"
+                android:layout_height="wrap_content"
+                android:text="P8"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="#0D7377"
+                android:gravity="center"
+                android:background="@drawable/widget_period_badge"
+                android:paddingTop="1dp"
+                android:paddingBottom="1dp" />
+
+            <TextView
+                android:id="@+id/period8_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Subject 8"
+                android:textSize="11sp"
+                android:textColor="#0F172A"
+                android:maxLines="1"
+                android:ellipsize="end" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/widget_no_periods"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="No periods scheduled today"
+            android:textSize="12sp"
+            android:textColor="#64748B"
+            android:gravity="center"
             android:visibility="gone" />
+
     </LinearLayout>
 
     <TextView
         android:id="@+id/widget_btn_take_roll"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="36dp"
+        android:layout_height="34dp"
         android:text="Take Roll Call"
         android:textSize="12sp"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
         android:background="@drawable/widget_button_bg"
         android:gravity="center"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="6dp" />
+        android:layout_marginTop="4dp" />
 
 </LinearLayout>
