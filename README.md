@@ -6,7 +6,7 @@
 
 A modern Android attendance management app built for Class Representatives to take, track, and manage classroom attendance with ease.
 
-[![Release](https://img.shields.io/badge/Release-v1.4.0-0D7377?style=for-the-badge)](https://github.com/Rizirfan/RollDesk/releases/download/v1.4.0/app-debug-v1.4.0.apk)
+[![Release](https://img.shields.io/badge/Release-v1.5.0-0D7377?style=for-the-badge)](https://github.com/Rizirfan/RollDesk/raw/main/built_apks/app-debug-v1.5.0.apk)
 [![License](https://img.shields.io/github/license/Rizirfan/RollDesk?style=for-the-badge&color=0D7377)](LICENSE)
 [![Android](https://img.shields.io/badge/Android-8.0%2B-3DDC84?style=for-the-badge&logo=android)](https://developer.android.com/about/versions/oreo)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.3.20-7F52FF?style=for-the-badge&logo=kotlin)](https://kotlinlang.org)
@@ -14,7 +14,7 @@ A modern Android attendance management app built for Class Representatives to ta
 
 ---
 
-[Download APK (v1.4.0)](https://github.com/Rizirfan/RollDesk/releases/download/v1.4.0/app-debug-v1.4.0.apk) | [Documentation](DOCUMENTATION.md) | [Report Issue](https://github.com/Rizirfan/RollDesk/issues)
+[Download APK (v1.5.0)](https://github.com/Rizirfan/RollDesk/raw/main/built_apks/app-debug-v1.5.0.apk) | [Documentation](DOCUMENTATION.md) | [Report Issue](https://github.com/Rizirfan/RollDesk/issues)
 
 </div>
 
@@ -27,7 +27,8 @@ A modern Android attendance management app built for Class Representatives to ta
 | **Attendance Tracking** | 2-step wizard for taking roll call with 5 status options (Present, Absent, Medical Leave, On Duty, Late) |
 | **Elective Management** | Create electives, enroll students, and take separate elective attendance |
 | **Dashboard** | At-a-glance overview with today's timetable, quick stats, and recent sessions |
-| **Timetable Editor** | Weekly class schedule editor (Mon-Fri, 6 periods) with PDF upload support |
+| **Home Screen Widget** | Responsive Quick Roll widget with live daily attendance progress and instant launch |
+| **Timetable Editor** | Weekly class schedule editor (Mon-Fri, 6-8 periods) with PDF upload support |
 | **Student Roster** | Searchable class roster with per-student attendance metrics |
 | **Reports & Export** | Generate attendance reports in PDF, Excel (.xlsx), or CSV format |
 | **Analytics** | Visual attendance analytics with circular and bar charts |
@@ -43,7 +44,7 @@ A modern Android attendance management app built for Class Representatives to ta
 
 Get the latest release directly from GitHub:
 
-**[Download RollDesk APK (v1.4.0)](https://github.com/Rizirfan/RollDesk/releases/download/v1.4.0/app-debug-v1.4.0.apk)**
+**[Download RollDesk APK (v1.5.0)](https://github.com/Rizirfan/RollDesk/raw/main/built_apks/app-debug-v1.5.0.apk)**
 
 > Requires Android 8.0 (API 26) or higher. Enable **Install from unknown sources** in your device settings to install the APK.
 
