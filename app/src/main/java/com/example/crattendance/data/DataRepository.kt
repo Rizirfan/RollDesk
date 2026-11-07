@@ -91,6 +91,9 @@ class DataRepository @Inject constructor(
     suspend fun saveAttendanceRecords(records: List<AttendanceRecordEntity>) = withContext(Dispatchers.IO) {
         attendanceDao.insertAll(records)
     }
+    suspend fun updateAttendanceRecord(record: AttendanceRecordEntity) = withContext(Dispatchers.IO) {
+        attendanceDao.update(record)
+    }
     suspend fun deletePeriodAttendance(date: String, period: Int) = withContext(Dispatchers.IO) {
         attendanceDao.deletePeriodAttendance(date, period)
     }
@@ -100,6 +103,9 @@ class DataRepository @Inject constructor(
     }
     suspend fun deleteAllAttendance() = withContext(Dispatchers.IO) {
         attendanceDao.deleteAll()
+    }
+    suspend fun deleteAttendanceRecord(id: Long) = withContext(Dispatchers.IO) {
+        attendanceDao.deleteById(id)
     }
 
     // Elective Students
@@ -142,8 +148,21 @@ class DataRepository @Inject constructor(
     suspend fun saveElectiveAttendanceRecords(records: List<ElectiveAttendanceRecordEntity>) = withContext(Dispatchers.IO) {
         electiveAttendanceDao.insertAll(records)
     }
+    suspend fun updateElectiveAttendanceRecord(record: ElectiveAttendanceRecordEntity) = withContext(Dispatchers.IO) {
+        electiveAttendanceDao.update(record)
+    }
     suspend fun deleteElectiveAttendanceForDateAndElective(date: String, electiveName: String) = withContext(Dispatchers.IO) {
         electiveAttendanceDao.deleteRecordsForDateAndElective(date, electiveName)
+    }
+    suspend fun deleteElectiveAttendanceRecord(id: Long) = withContext(Dispatchers.IO) {
+        electiveAttendanceDao.deleteById(id)
+    }
+    suspend fun deleteElectiveAttendanceForDateAndElectiveAndSubject(
+        date: String,
+        electiveName: String,
+        subject: String
+    ) = withContext(Dispatchers.IO) {
+        electiveAttendanceDao.deleteRecordsForDateAndElectiveAndSubject(date, electiveName, subject)
     }
     suspend fun replaceElectiveAttendance(date: String, electiveName: String, subject: String, records: List<ElectiveAttendanceRecordEntity>) = withContext(Dispatchers.IO) {
         electiveAttendanceDao.deleteRecordsForDateAndElectiveAndSubject(date, electiveName, subject)

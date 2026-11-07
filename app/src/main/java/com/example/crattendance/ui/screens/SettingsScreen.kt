@@ -1,6 +1,7 @@
 package com.example.crattendance.ui.screens
 
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,16 +11,20 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.crattendance.theme.Teal
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.os.Build
@@ -33,6 +38,7 @@ import kotlinx.coroutines.launch
 fun SettingsScreen(
     viewModel: CRAttendanceViewModel,
     onBack: () -> Unit,
+    onNavigateToRecords: () -> Unit,
     onClearAllData: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -41,6 +47,7 @@ fun SettingsScreen(
     val records by viewModel.attendanceRecords.collectAsState()
     val threshold by viewModel.attendanceThreshold.collectAsState()
     val themeMode by viewModel.themeMode.collectAsState()
+    val notesEnabled by viewModel.notesEnabled.collectAsState()
     var showResetDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
@@ -195,6 +202,100 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
+            // Features
+            Text("Features", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.surfaceContainerLow,
+                border = if (notesEnabled) {
+                    BorderStroke(1.dp, Teal.copy(alpha = 0.35f))
+                } else {
+                    BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+                        ) { viewModel.setNotesEnabled(!notesEnabled) }
+                        .padding(horizontal = 14.dp, vertical = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(38.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(Teal.copy(alpha = if (notesEnabled) 0.14f else 0.08f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = null,
+                            tint = if (notesEnabled) Teal else MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(19.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Column(modifier = Modifier.weight(1f)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                "Quick Notes",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                color = if (notesEnabled) MaterialTheme.colorScheme.onSurface
+                                else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Surface(
+                                shape = RoundedCornerShape(50),
+                                color = if (notesEnabled) Teal.copy(alpha = 0.12f)
+                                else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f)
+                            ) {
+                                Text(
+                                    text = if (notesEnabled) "ON" else "OFF",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (notesEnabled) Teal
+                                    else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp)
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = if (notesEnabled) "Write a note and save it to Google Keep"
+                            else "Off — turn on to add the quick note button",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Switch(
+                        checked = notesEnabled,
+                        onCheckedChange = { viewModel.setNotesEnabled(it) },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = MaterialTheme.colorScheme.surface,
+                            checkedTrackColor = Teal,
+                            checkedBorderColor = Teal,
+                            uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            uncheckedTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
+                            uncheckedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f)
+                        )
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
             Text("App Widgets", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -280,6 +381,38 @@ fun SettingsScreen(
             FlatInfoRow("Attendance Records", "${records.size}")
             HorizontalDivider(color = MaterialTheme.colorScheme.outline)
             FlatInfoRow("Threshold", "${threshold}%")
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 12.dp)
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+                    ) { onNavigateToRecords() },
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Manage Attendance Records",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = "Browse, search, and delete attendance history",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Icon(
+                    imageVector = Icons.Default.ArrowForward,
+                    contentDescription = "Open Records",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
 
             Spacer(modifier = Modifier.height(20.dp))
 

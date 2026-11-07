@@ -110,6 +110,16 @@ class QuickRollWidget : AppWidgetProvider() {
                         "$completedCount/${sortedPeriods.size} Completed"
                     )
 
+                    val total = sortedPeriods.size
+                    val progressPercent = if (total == 0) 0 else (completedCount * 100 / total)
+
+                    val statusColorId = when {
+                        completedCount == 0 -> R.drawable.widget_status_bg
+                        completedCount == total -> R.drawable.widget_status_done
+                        else -> R.drawable.widget_status_partial
+                    }
+                    views.setInt(R.id.widget_attendance_status, "setBackgroundResource", statusColorId)
+
                     for (i in slotRows.indices) {
                         if (i < sortedPeriods.size) {
                             val period = sortedPeriods[i]

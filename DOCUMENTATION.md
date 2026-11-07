@@ -23,6 +23,8 @@
    - [Reports](#8-reports)
    - [Analytics](#9-analytics)
    - [Settings](#10-settings)
+   - [Records](#11-records)
+   - [Quick Notes (Google Keep)](#12-quick-notes-google-keep)
 4. [Attendance System](#attendance-system)
 5. [Data Models](#data-models)
 6. [Export Formats](#export-formats)
@@ -36,6 +38,7 @@
 
 **RollDesk** is a Class Representative attendance management app designed for college students. It provides a streamlined workflow for taking classroom attendance, managing student rosters, tracking elective subjects, generating reports, and visualizing attendance analytics.
 
+- **Current Version:** 1.6.0
 - **Package:** `com.example.crattendance`
 - **Min Android:** 8.0 (API 26)
 - **Target Android:** 16 (API 36)
@@ -50,12 +53,14 @@
 |---------|-------------|
 | Attendance Tracking | Take attendance for regular classes with 5 status options |
 | Elective Management | Create electives, enroll students, track elective attendance separately |
-| Dashboard | Overview with today's timetable, stats, and recent sessions |
+| Dashboard | Overview with today's timetable, stats, overview card, and recent sessions |
+| Quick Notes | Optional note composer that hands text to Google Keep (toggle in Settings) |
 | Timetable Editor | Weekly schedule editor with PDF upload |
 | Student Roster | Searchable roster with per-student attendance metrics |
 | Reports | Export as PDF, Excel (.xlsx), or CSV |
 | Analytics | Visual charts for attendance performance |
 | Dark Mode | System default / Light / Dark theme support |
+| Records History | Browse, search, filter, and delete attendance records (regular and elective) |
 | Backup/Restore | JSON export/import of all data |
 | Quick Share | Share attendance via text, PDF, or share sheet |
 
@@ -101,11 +106,12 @@ The home screen provides a quick overview of everything.
 |---------|-------------|
 | **Greeting** | Time-of-day adaptive greeting with today's date |
 | **Today's Timetable** | Teal banner showing periods and subjects for the current day, with a "Take Attendance" button |
-| **Elective Banner** | Amber-colored shortcut to elective attendance |
+| **Elective Banner** | Amber shortcut with an arrow that opens elective attendance |
 | **Quick Stats** | Two cards: Students count and Periods Today count (clickable) |
-| **Overview Card** | Total students and total attendance records |
+| **Overview Card** | Total students and records, plus a "View attendance records →" shortcut |
 | **Recent Sessions** | Last 5 regular attendance sessions with present/absent counts |
 | **Recent Electives** | Last 5 elective attendance sessions |
+| **Quick Note Icon** | Header shortcut that opens the note composer; visible only when Quick Notes is enabled |
 
 **Session Detail Popup:**
 - Tap any session to view full details
@@ -285,6 +291,8 @@ App configuration and profile management.
 |---------|---------|
 | **Appearance** | System Default / Light / Dark theme |
 | **College Profile** | Edit college name, department, course, semester, section |
+| **Features** | **Quick Notes** toggle — enable/disable the Home note shortcut and Google Keep handoff |
+| **App Widgets** | Refresh the Quick Roll widget and pin it to the home screen |
 | **Database Stats** | Students count, attendance records, threshold % |
 | **Export Roster** | Export All (full roster PDF), Export Elective (elective roster PDF) |
 
@@ -294,6 +302,67 @@ App configuration and profile management.
 - Contains "Clear All Data & Start Fresh" button
 - Confirmation required before deletion
 - Clears all students, timetable, attendance, electives, and resets setup state
+
+---
+
+### 11. Records
+
+The Records screen provides a complete browseable history of all attendance sessions (regular and elective).
+
+**Features:**
+- Browse the entire attendance history, grouped by date (newest first) and session.
+- Filter chips: All / Regular / Elective with **scope-aware counts**:
+  - All → `total records` + `sessions`
+  - Regular → `regular records` + `sessions`
+  - Elective → `elective records` + `sessions`
+- Header search icon expands a compact search field (auto-focused) that matches student name, RRN, subject, elective name, or date.
+- Expand a session card to view every student and their status.
+- **Copy icon** beside the session delete button copies a text report (subject, date, period/elective, and Present/Absent/Other lists with names and RRNs).
+- **Present/Absent checkbox** on each expanded student row, mirroring the Roll Call screen:
+  - Checked (green) = Present
+  - Unchecked (red) = Absent
+  - Updates the saved record immediately and refreshes the widget.
+- Delete an individual student's attendance record (confirmation required).
+- Delete an entire attendance session (confirmation required).
+- Delete all records with scope: Regular only, Elective only, or Both. Students, timetable, college profile, and elective enrollments are kept.
+- The home-screen widget refreshes after any deletion.
+
+**UX notes:**
+- Dates stored as `yyyy-MM-dd` are displayed as `EEE, d MMM yyyy`.
+- Records are grouped by date, newest first, then sessions sorted by period (regular) or elective name (elective).
+- A 1 dp divider separates each date group beneath its date header.
+- Session keys use `date + period + subject` (regular) or `date + electiveName + subject` (elective).
+- All destructive actions show a confirmation dialog with Cancel and a red Delete confirm button.
+
+---
+
+### 12. Quick Notes (Google Keep)
+
+Quick Notes is an optional fast note composer that hands text to the Google Keep app.
+
+**Enable / disable:**
+- Go to **Settings → Features → Quick Notes**.
+- The toggle is **off by default**; its state is saved in DataStore.
+- When off, the Home note icon is hidden. Nothing else in the app changes.
+
+**Composer (opened from the Home header note icon):**
+
+| Element | Description |
+|---------|-------------|
+| Title | Optional single-line note title |
+| Note | Multi-line body, auto-focused, keyboard-aware |
+| Save to Keep | Opens Google Keep with the note pre-filled (`ACTION_SEND`, `text/plain`) |
+| Open Keep | Launches the Google Keep app; falls back to its Play Store listing |
+
+**Handoff order for Save to Keep:**
+1. Google Keep (`com.google.android.keep`) if installed.
+2. System share sheet if another app can handle `text/plain`.
+3. Clipboard, with a toast, if no handler exists.
+
+**Limitations:**
+- RollDesk does **not** store notes locally — Keep is the storage.
+- Google Keep has no public notes API, so RollDesk cannot browse, read, or sync Keep notes.
+- The manifest declares package visibility (`<queries>`) for Google Keep and `text/plain` SEND intents so detection works on Android 11+.
 
 ---
 
@@ -387,8 +456,10 @@ App configuration and profile management.
 |-----|------|---------|---------|
 | `setup_completed` | Boolean | false | First-run wizard state |
 | `attendance_threshold` | Int | 75 | Target attendance % |
+| `periods_per_day` | Int | 6 | Periods per day (6, 7, or 8) |
 | `timetable_pdf_path` | String? | null | Uploaded timetable PDF path |
 | `theme_mode` | Int | 0 | 0=System, 1=Light, 2=Dark |
+| `notes_enabled` | Boolean | false | Quick Notes / Google Keep feature toggle |
 
 ---
 
@@ -436,6 +507,17 @@ App configuration and profile management.
 
 ---
 
+## Integrations & Permissions
+
+| Integration | Direction | Notes |
+|-------------|-----------|-------|
+| Google Keep | Outbound share | Optional Quick Notes handoff via `ACTION_SEND` (`text/plain`). No data is read from Keep. |
+| Home Screen Widget | System | Quick Roll widget receives `APPWIDGET_UPDATE`, `DATE_CHANGED`, `TIME_SET`, and `TIMEZONE_CHANGED`. |
+| FileProvider | Internal | Securely shares generated PDFs with viewer/share apps. |
+| Runtime permissions | None | The app requires no camera, storage, location, or internet permission. |
+
+---
+
 ## Tech Stack
 
 | Library | Version | Purpose |
@@ -477,22 +559,28 @@ app/src/main/java/com/example/crattendance/
 ├── theme/
 │   ├── AttendanceStatus.kt         # Enum with 5 statuses + colors
 │   ├── Color.kt                    # Primary (teal), accent (amber), semantic
+│   ├── Motion.kt                   # Shared motion/animation tokens
 │   ├── Theme.kt                    # Light/Dark Material3 theme
 │   └── Type.kt                     # Custom typography (12 styles)
 │
 ├── ui/
 │   ├── components/
-│   │   ├── BottomNavBar.kt         # 3-tab navigation (Home/Attendance/Students)
-│   │   └── DashboardWidgets.kt     # MetricCard, Charts, ActionChip
+│   │   ├── BottomNavBar.kt         # 4-tab navigation (Home/Attendance/Students/Records)
+│   │   ├── DashboardWidgets.kt     # MetricCard, Charts, ActionChip
+│   │   └── Motion.kt               # Press feedback + motion helpers
+│   ├── navigation/
+│   │   └── NavTransitions.kt       # Enter/pop/predictive transitions
 │   ├── main/
 │   │   └── CRAttendanceViewModel.kt # Shared @HiltViewModel
 │   └── screens/
-│       ├── DashboardScreen.kt       # Home overview (1017 lines)
-│       ├── TakeAttendanceScreen.kt  # Attendance wizard (711 lines)
-│       ├── ElectiveSetupScreen.kt   # Elective management (750 lines)
+│       ├── DashboardScreen.kt       # Home overview
+│       ├── TakeAttendanceScreen.kt  # Attendance wizard
+│       ├── ElectiveSetupScreen.kt   # Elective management
 │       ├── StudentListScreen.kt     # Roster with search
 │       ├── StudentDetailsScreen.kt  # Per-student metrics
 │       ├── TimetableScreen.kt       # Schedule editor + PDF
+│       ├── RecordsScreen.kt         # Attendance records history
+│       ├── NotesSheet.kt            # Quick note composer → Google Keep
 │       ├── ReportsScreen.kt         # Export center (PDF/Excel/CSV)
 │       ├── AnalyticsScreen.kt       # Charts and analytics
 │       ├── SettingsScreen.kt        # Configuration + danger zone
@@ -520,6 +608,11 @@ app/src/main/java/com/example/crattendance/
 | `StudentDetails` | `rrn: String` | Student detail view |
 | `TimetableScreen` | None | Schedule editor |
 | `SettingsScreen` | None | App settings |
+| `Records` | None | Attendance Records history |
+| `Reports` | None | Export center |
+| `Analytics` | None | Attendance analytics |
+| `EditAttendance` | `date: String`, `period: Int` | Edit a regular session |
+| `EditElectiveAttendance` | `date: String`, `electiveName: String`, `subject: String` | Edit an elective session |
 
 ### Bottom Navigation
 
@@ -528,6 +621,7 @@ app/src/main/java/com/example/crattendance/
 | Home | House | Dashboard |
 | Attendance | Check Circle | TakeAttendance |
 | Students | People | StudentList |
+| Records | History | Records |
 
 ---
 

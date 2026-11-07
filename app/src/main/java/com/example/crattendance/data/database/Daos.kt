@@ -98,11 +98,17 @@ interface AttendanceDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(records: List<AttendanceRecordEntity>)
 
+    @Update
+    fun update(record: AttendanceRecordEntity)
+
     @Query("DELETE FROM attendance_records WHERE date = :date AND period = :period")
     fun deletePeriodAttendance(date: String, period: Int)
 
     @Query("DELETE FROM attendance_records")
     fun deleteAll()
+
+    @Query("DELETE FROM attendance_records WHERE id = :id")
+    fun deleteById(id: Long)
 }
 
 @Dao
@@ -158,6 +164,9 @@ interface ElectiveAttendanceDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(records: List<ElectiveAttendanceRecordEntity>)
 
+    @Update
+    fun update(record: ElectiveAttendanceRecordEntity)
+
     @Query("UPDATE elective_attendance_records SET electiveName = :newName WHERE electiveName = :oldName")
     fun renameElective(oldName: String, newName: String)
 
@@ -169,4 +178,7 @@ interface ElectiveAttendanceDao {
 
     @Query("DELETE FROM elective_attendance_records")
     fun deleteAll()
+
+    @Query("DELETE FROM elective_attendance_records WHERE id = :id")
+    fun deleteById(id: Long)
 }

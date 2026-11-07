@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.CheckCircle
@@ -53,6 +54,9 @@ fun DashboardScreen(
     onNavigateToStudentList: () -> Unit,
     onNavigateToTimetable: () -> Unit,
     onNavigateToSettings: () -> Unit,
+    onNavigateToRecords: () -> Unit,
+    onNavigateToReports: () -> Unit,
+    onNavigateToAnalytics: () -> Unit,
     onEditSession: (date: String, period: Int) -> Unit,
     onEditElectiveSession: (date: String, electiveName: String, subject: String) -> Unit,
     modifier: Modifier = Modifier
@@ -62,6 +66,7 @@ fun DashboardScreen(
     val timetable by viewModel.timetable.collectAsState()
     val electiveRecords by viewModel.electiveAttendanceRecords.collectAsState()
     val electiveNames by viewModel.electiveNames.collectAsState()
+    val notesEnabled by viewModel.notesEnabled.collectAsState()
     val context = LocalContext.current
 
     val studentMap = remember(students) {
@@ -78,6 +83,7 @@ fun DashboardScreen(
 
     var calendarSelectedDate by remember { mutableStateOf<String?>(null) }
     var showCalendarDialog by remember { mutableStateOf(false) }
+    var showNotesSheet by remember { mutableStateOf(false) }
 
     var showElectivePicker by remember { mutableStateOf(false) }
     var editingElectiveName by remember { mutableStateOf<String?>(null) }
@@ -160,6 +166,15 @@ fun DashboardScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(top = 2.dp)
                         )
+                    }
+                    if (notesEnabled) {
+                        IconButton(onClick = { showNotesSheet = true }) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Quick note",
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
                     }
                     IconButton(onClick = {
                         val parts = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()).split("-")
@@ -294,10 +309,10 @@ fun DashboardScreen(
                             )
                         }
                         Icon(
-                            imageVector = Icons.Default.TrendingUp,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                            modifier = Modifier.size(16.dp)
+                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                            contentDescription = "Open elective attendance",
+                            tint = com.example.crattendance.theme.Elective,
+                            modifier = Modifier.size(18.dp)
                         )
                     }
                 }
@@ -342,7 +357,7 @@ fun DashboardScreen(
                         color = MaterialTheme.colorScheme.surfaceContainerLow,
                         modifier = Modifier
                             .weight(1f)
-                            .clickable { onNavigateToTimetable() }
+                                                        .clickable { onNavigateToTimetable() }
                     ) {
                         Column(modifier = Modifier.padding(14.dp)) {
                             Icon(
@@ -364,6 +379,7 @@ fun DashboardScreen(
                             )
                         }
                     }
+
                 }
             }
 
@@ -374,36 +390,63 @@ fun DashboardScreen(
                     color = MaterialTheme.colorScheme.surfaceContainerLow,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 14.dp, vertical = 14.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Default.TrendingUp,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                "Overview",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.SemiBold
-                            )
+                    Column {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 14.dp, vertical = 14.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Default.TrendingUp,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    "Overview",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text("$totalStudents", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                                    Text("Students", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text("$totalRecords", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                                    Text("Records", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                            }
                         }
-                        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("$totalStudents", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-                                Text("Students", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("$totalRecords", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-                                Text("Records", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                            thickness = 0.5.dp
+                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onNavigateToRecords() }
+                                .padding(horizontal = 14.dp, vertical = 10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                "View attendance records",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                contentDescription = "Open records",
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(16.dp)
+                            )
                         }
                     }
                 }
@@ -1341,5 +1384,9 @@ fun DashboardScreen(
                 }
             }
         )
+    }
+
+    if (showNotesSheet) {
+        NotesComposerSheet(onDismiss = { showNotesSheet = false })
     }
 }

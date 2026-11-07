@@ -1,10 +1,14 @@
 package com.example.crattendance.ui.components
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material3.Icon
@@ -13,7 +17,12 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.crattendance.theme.Motion
 import com.example.crattendance.theme.Teal
 
 enum class BottomNavItem(
@@ -24,6 +33,7 @@ enum class BottomNavItem(
     Dashboard("Home", Icons.Filled.Home, Icons.Outlined.Home),
     TakeAttendance("Attendance", Icons.Filled.CheckCircle, Icons.Outlined.CheckCircle),
     Students("Students", Icons.Filled.People, Icons.Outlined.People),
+    Records("Records", Icons.Filled.History, Icons.Outlined.History),
 }
 
 @Composable
@@ -37,6 +47,14 @@ fun AppBottomNavBar(
     ) {
         BottomNavItem.entries.forEachIndexed { index, item ->
             val selected = index == selectedIndex
+            val iconScale by animateFloatAsState(
+                targetValue = if (selected) 1.06f else 1f,
+                animationSpec = tween(
+                    durationMillis = Motion.Tab.toInt()
+                ),
+                label = "bottomNavIconScale"
+            )
+
             NavigationBarItem(
                 selected = selected,
                 onClick = { onItemSelected(index) },
@@ -44,6 +62,10 @@ fun AppBottomNavBar(
                     Icon(
                         imageVector = if (selected) item.selectedIcon else item.unselectedIcon,
                         contentDescription = item.label,
+                        modifier = Modifier.scale(
+                            scaleX = iconScale,
+                            scaleY = iconScale
+                        )
                     )
                 },
                 label = { Text(item.label) },

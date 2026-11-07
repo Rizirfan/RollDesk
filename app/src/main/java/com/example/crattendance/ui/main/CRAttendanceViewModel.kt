@@ -52,6 +52,9 @@ class CRAttendanceViewModel @Inject constructor(
     val periodsPerDay: StateFlow<Int> = preferences.periodsPerDay
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 6)
 
+    val notesEnabled: StateFlow<Boolean> = preferences.notesEnabled
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     // Elective StateFlows
     val electiveNames: StateFlow<List<String>> = repository.allElectiveNames
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -77,6 +80,12 @@ class CRAttendanceViewModel @Inject constructor(
             }
             preferences.setPeriodsPerDay(normalized)
             repository.deleteTimetablePeriodsGreaterThan(normalized)
+        }
+    }
+
+    fun setNotesEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            preferences.setNotesEnabled(enabled)
         }
     }
 
@@ -240,6 +249,55 @@ class CRAttendanceViewModel @Inject constructor(
     fun deleteElectiveAttendanceForDateAndElective(date: String, electiveName: String) {
         viewModelScope.launch {
             repository.deleteElectiveAttendanceForDateAndElective(date, electiveName)
+        }
+    }
+
+    fun deleteAttendanceRecord(recordId: Long): Job {
+        return viewModelScope.launch {
+            repository.deleteAttendanceRecord(recordId)
+        }
+    }
+
+    fun updateAttendanceRecord(record: com.example.crattendance.data.database.AttendanceRecordEntity): Job {
+        return viewModelScope.launch {
+            repository.updateAttendanceRecord(record)
+        }
+    }
+
+    fun updateElectiveAttendanceRecord(record: ElectiveAttendanceRecordEntity): Job {
+        return viewModelScope.launch {
+            repository.updateElectiveAttendanceRecord(record)
+        }
+    }
+
+    fun deleteElectiveAttendanceRecord(recordId: Long): Job {
+        return viewModelScope.launch {
+            repository.deleteElectiveAttendanceRecord(recordId)
+        }
+    }
+
+    fun deleteElectiveSession(date: String, electiveName: String, subject: String): Job {
+        return viewModelScope.launch {
+            repository.deleteElectiveAttendanceForDateAndElectiveAndSubject(date, electiveName, subject)
+        }
+    }
+
+    fun deleteAllRegularAttendance(): Job {
+        return viewModelScope.launch {
+            repository.deleteAllAttendance()
+        }
+    }
+
+    fun deleteAllElectiveAttendance(): Job {
+        return viewModelScope.launch {
+            repository.deleteAllElectiveAttendance()
+        }
+    }
+
+    fun deleteAllAttendanceAndElective(): Job {
+        return viewModelScope.launch {
+            repository.deleteAllAttendance()
+            repository.deleteAllElectiveAttendance()
         }
     }
 
