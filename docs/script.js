@@ -94,6 +94,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     featureCards.forEach(card => cardObserver.observe(card));
 
+    
+    // ── Release cards reveal on scroll ──
+    const releaseCards = document.querySelectorAll('.release-card');
+    const releaseObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const delay = entry.target.getAttribute('data-delay') || 0;
+                setTimeout(() => {
+                    entry.target.classList.add('visible');
+                }, delay * 90);
+                releaseObserver.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    releaseCards.forEach(card => releaseObserver.observe(card));
     // ── Animated stat counter ──
     const statValues = document.querySelectorAll('.stat-value');
 
