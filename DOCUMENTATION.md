@@ -38,7 +38,7 @@
 
 **RollDesk** is a Class Representative attendance management app designed for college students. It provides a streamlined workflow for taking classroom attendance, managing student rosters, tracking elective subjects, generating reports, and visualizing attendance analytics.
 
-- **Current Version:** 1.6.0
+- **Current Version:** 1.6.1
 - **Package:** `com.example.crattendance`
 - **Min Android:** 8.0 (API 26)
 - **Target Android:** 16 (API 36)

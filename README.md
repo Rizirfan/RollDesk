@@ -6,7 +6,7 @@
 
 A modern Android attendance management app built for Class Representatives to take, track, and manage classroom attendance with ease.
 
-[![Release](https://img.shields.io/badge/Release-v1.6.0-0D7377?style=for-the-badge)](https://github.com/Rizirfan/RollDesk/releases/download/v1.6.0/RollDesk-v1.6.0.apk)
+[![Release](https://img.shields.io/badge/Release-v1.6.1-0D7377?style=for-the-badge)](https://github.com/Rizirfan/RollDesk/releases/download/v1.6.1/RollDesk-v1.6.1.apk)
 [![License](https://img.shields.io/github/license/Rizirfan/RollDesk?style=for-the-badge&color=0D7377)](LICENSE)
 [![Android](https://img.shields.io/badge/Android-8.0%2B-3DDC84?style=for-the-badge&logo=android)](https://developer.android.com/about/versions/oreo)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.3.20-7F52FF?style=for-the-badge&logo=kotlin)](https://kotlinlang.org)
@@ -14,7 +14,7 @@ A modern Android attendance management app built for Class Representatives to ta
 
 ---
 
-[Download APK (v1.6.0)](https://github.com/Rizirfan/RollDesk/releases/download/v1.6.0/RollDesk-v1.6.0.apk) | [All Releases](https://github.com/Rizirfan/RollDesk/releases) | [Documentation](DOCUMENTATION.md) | [Report Issue](https://github.com/Rizirfan/RollDesk/issues)
+[Download APK (v1.6.1)](https://github.com/Rizirfan/RollDesk/releases/download/v1.6.1/RollDesk-v1.6.1.apk) | [All Releases](https://github.com/Rizirfan/RollDesk/releases) | [Documentation](DOCUMENTATION.md) | [Report Issue](https://github.com/Rizirfan/RollDesk/issues)
 
 </div>
 
@@ -38,12 +38,16 @@ A modern Android attendance management app built for Class Representatives to ta
 | **Backup & Restore** | Export/import all data as JSON for safekeeping |
 | **Quick Share** | Share attendance via text, PDF, or system share sheet |
 
-## What's New in v1.6.0
+## What's New in v1.6.1
+
+- **Quick Roll widget progress fix** — the home-screen widget's completed progress bar now updates correctly. It reflects the day's `completed/total` periods, resets when there are no periods, and is clamped so it never exceeds 100%.
+
+### v1.6.0 Highlights
 
 - **Quick Notes + Google Keep** — a note icon on Home opens a fast composer. **Save to Keep** hands the title and body to Google Keep; **Open Keep** launches the app. Enable or disable the feature in **Settings → Features → Quick Notes**.
 - **Records upgrades** — scope-aware counts, header search, copy a session as text, present/absent checkboxes per student, and clear date separators.
 - **Home polish** — the Elective Attendance banner now has a proper arrow, and the Overview card links directly to attendance records.
-- **Widget polish** — daily progress bar and status-aware colors for the Quick Roll widget.
+- **Widget polish** — status-aware colors and daily progress for the Quick Roll widget.
 
 ## Screenshots
 
@@ -53,7 +57,7 @@ A modern Android attendance management app built for Class Representatives to ta
 
 Get the latest release directly from GitHub:
 
-**[Download RollDesk APK (v1.6.0)](https://github.com/Rizirfan/RollDesk/releases/download/v1.6.0/RollDesk-v1.6.0.apk)**
+**[Download RollDesk APK (v1.6.1)](https://github.com/Rizirfan/RollDesk/releases/download/v1.6.1/RollDesk-v1.6.1.apk)**
 
 > Requires Android 8.0 (API 26) or higher. Enable **Install from unknown sources** in your device settings to install the APK.
 
