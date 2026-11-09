@@ -102,6 +102,7 @@ class QuickRollWidget : AppWidgetProvider() {
                         views.setViewVisibility(rowId, android.view.View.GONE)
                     }
                     views.setViewVisibility(R.id.widget_attendance_status, android.view.View.GONE)
+                    views.setProgressBar(R.id.widget_progress, 100, 0, false)
                 } else {
                     views.setViewVisibility(R.id.widget_no_periods, android.view.View.GONE)
                     views.setViewVisibility(R.id.widget_attendance_status, android.view.View.VISIBLE)
@@ -111,7 +112,10 @@ class QuickRollWidget : AppWidgetProvider() {
                     )
 
                     val total = sortedPeriods.size
-                    val progressPercent = if (total == 0) 0 else (completedCount * 100 / total)
+                    val progressPercent =
+                        if (total == 0) 0 else (completedCount.coerceAtMost(total) * 100 / total)
+
+                    views.setProgressBar(R.id.widget_progress, 100, progressPercent, false)
 
                     val statusColorId = when {
                         completedCount == 0 -> R.drawable.widget_status_bg
@@ -149,6 +153,7 @@ class QuickRollWidget : AppWidgetProvider() {
                 views.setTextViewText(R.id.widget_day, "RollDesk")
                 views.setViewVisibility(R.id.widget_no_periods, android.view.View.VISIBLE)
                 views.setViewVisibility(R.id.widget_attendance_status, android.view.View.GONE)
+                views.setProgressBar(R.id.widget_progress, 100, 0, false)
             }
 
             appWidgetManager.updateAppWidget(appWidgetId, views)
